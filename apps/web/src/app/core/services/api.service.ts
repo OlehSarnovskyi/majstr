@@ -33,6 +33,7 @@ export interface Master {
   bio: string | null;
   city?: string | null;
   createdAt?: string;
+  phone?: string | null; // returned only in booking context (PENDING/CONFIRMED), never on public profile
   workingHours?: WorkingHours | null;
   _count?: { services: number };
   services?: Service[];
