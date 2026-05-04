@@ -1,6 +1,7 @@
 import { Module, NestModule, MiddlewareConsumer, RequestMethod } from '@nestjs/common';
-import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { CustomThrottlerGuard } from '../common/guards/throttler.guard';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from '../prisma/prisma.module';
@@ -32,7 +33,7 @@ import { SeedModule } from '../seed/seed.module';
   controllers: [AppController],
   providers: [
     AppService,
-    { provide: APP_GUARD, useClass: ThrottlerGuard },
+    { provide: APP_GUARD, useClass: CustomThrottlerGuard },
   ],
 })
 export class AppModule implements NestModule {
