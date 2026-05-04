@@ -31,6 +31,12 @@ export class UpdateProfileDto {
   bio?: string;
 
   @IsOptional()
+  @IsString()
+  @Transform(({ value }) => value?.trim() || undefined)
+  @MaxLength(100)
+  city?: string;
+
+  @IsOptional()
   @IsObject()
   workingHours?: Record<string, { enabled: boolean; from: string; to: string }>;
 }

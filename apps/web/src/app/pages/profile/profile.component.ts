@@ -57,6 +57,7 @@ export class ProfileComponent implements OnInit {
   lastName = '';
   phone = '';
   bio = '';
+  city = '';
 
   readonly dayKeys = DAY_KEYS;
   readonly dayLabels = DAY_LABELS;
@@ -75,6 +76,7 @@ export class ProfileComponent implements OnInit {
       this.lastName = u.lastName;
       this.phone = u.phone || '';
       this.bio = u.bio || '';
+      this.city = u.city || '';
       if (u.avatar) {
         this.avatarPreview.set(u.avatar);
       }
@@ -166,6 +168,7 @@ export class ProfileComponent implements OnInit {
       lastName: this.lastName,
       phone: this.phone || undefined,
       bio: this.bio || undefined,
+      city: this.city || undefined,
     };
 
     if (this.auth.isMaster()) {

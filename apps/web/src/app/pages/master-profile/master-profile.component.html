@@ -21,16 +21,28 @@
             <p class="profile__bio">{{ m.bio }}</p>
           }
           <div class="profile__meta">
-            @if (m.phone) {
+            @if (m.city) {
               <span class="profile__meta-item">
-                <span class="material-icons-outlined">phone</span>
-                {{ m.phone }}
+                <span class="material-icons-outlined">location_on</span>
+                {{ m.city }}
               </span>
             }
             <span class="profile__meta-item">
               <span class="material-icons-outlined">build</span>
               {{ m.services?.length || 0 }} služieb
             </span>
+            @if (getWorkingDays(m)) {
+              <span class="profile__meta-item">
+                <span class="material-icons-outlined">calendar_today</span>
+                {{ getWorkingDays(m) }}
+              </span>
+            }
+            @if (getMemberSince(m)) {
+              <span class="profile__meta-item">
+                <span class="material-icons-outlined">verified</span>
+                Na platforme od {{ getMemberSince(m) }}
+              </span>
+            }
           </div>
         </div>
       </div>

@@ -31,7 +31,8 @@ export interface Master {
   lastName: string;
   avatar: string | null;
   bio: string | null;
-  phone?: string;
+  city?: string | null;
+  createdAt?: string;
   workingHours?: WorkingHours | null;
   _count?: { services: number };
   services?: Service[];

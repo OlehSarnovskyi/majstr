@@ -14,6 +14,7 @@ export interface User {
   phone?: string;
   avatar?: string;
   bio?: string;
+  city?: string | null;
   workingHours?: WorkingHours | null;
 }
 
@@ -81,6 +82,7 @@ export class AuthService {
     lastName?: string;
     phone?: string;
     bio?: string;
+    city?: string;
     workingHours?: WorkingHours;
   }) {
     return this.http

@@ -35,10 +35,18 @@
             @if (m.bio) {
               <p class="master-card__bio">{{ m.bio }}</p>
             }
-            <span class="master-card__count">
-              <span class="material-icons-outlined">build</span>
-              {{ m._count?.services || 0 }} služieb
-            </span>
+            <div class="master-card__footer">
+              @if (m.city) {
+                <span class="master-card__city">
+                  <span class="material-icons-outlined">location_on</span>
+                  {{ m.city }}
+                </span>
+              }
+              <span class="master-card__count">
+                <span class="material-icons-outlined">build</span>
+                {{ m._count?.services || 0 }} služieb
+              </span>
+            </div>
           </div>
         </a>
       }

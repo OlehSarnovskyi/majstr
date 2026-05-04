@@ -35,4 +35,21 @@ export class MasterProfileComponent implements OnInit {
   getInitials(m: Master): string {
     return (m.firstName[0] + m.lastName[0]).toUpperCase();
   }
+
+  getWorkingDays(m: Master): string {
+    if (!m.workingHours) return '';
+    const labels: Record<string, string> = {
+      mon: 'Po', tue: 'Ut', wed: 'St', thu: 'Št', fri: 'Pi', sat: 'So', sun: 'Ne',
+    };
+    const enabled = Object.entries(m.workingHours)
+      .filter(([, v]) => v.enabled)
+      .map(([k]) => labels[k]);
+    return enabled.length ? enabled.join(', ') : '';
+  }
+
+  getMemberSince(m: Master): string {
+    if (!m.createdAt) return '';
+    const d = new Date(m.createdAt);
+    return d.toLocaleDateString('sk-SK', { month: 'long', year: 'numeric' });
+  }
 }

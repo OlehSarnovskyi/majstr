@@ -88,6 +88,20 @@
             }
           </div>
 
+          <!-- City -->
+          <div class="form-field">
+            <label class="form-field__label" for="profile-city">Mesto / Район</label>
+            <input
+              id="profile-city"
+              type="text"
+              class="form-field__input"
+              [(ngModel)]="city"
+              placeholder="napr. Bratislava, Košice..."
+              maxlength="100"
+            />
+            <span class="form-field__hint">Klienti uvidia kde pôsobíte</span>
+          </div>
+
           <!-- Bio (masters only) -->
           @if (auth.isMaster()) {
             <div class="form-field">

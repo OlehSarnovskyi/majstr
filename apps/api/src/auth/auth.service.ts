@@ -165,7 +165,7 @@ export class AuthService {
 
   async updateProfile(
     userId: string,
-    dto: { firstName?: string; lastName?: string; phone?: string; bio?: string; workingHours?: object }
+    dto: { firstName?: string; lastName?: string; phone?: string; bio?: string; city?: string; workingHours?: object }
   ) {
     return this.prisma.user.update({
       where: { id: userId },
@@ -178,8 +178,10 @@ export class AuthService {
         phone: true,
         avatar: true,
         bio: true,
+        city: true,
         role: true,
         roleChosen: true,
+        workingHours: true,
       },
     });
   }
@@ -210,8 +212,10 @@ export class AuthService {
         phone: true,
         avatar: true,
         bio: true,
+        city: true,
         role: true,
         roleChosen: true,
+        workingHours: true,
       },
     });
   }
@@ -227,6 +231,7 @@ export class AuthService {
         phone: true,
         avatar: true,
         bio: true,
+        city: true,
         role: true,
         roleChosen: true,
         workingHours: true,
@@ -339,6 +344,7 @@ export class AuthService {
     lastName: string;
     role: string;
     roleChosen: boolean;
+    city?: string | null;
     workingHours?: unknown;
   }) {
     const payload = { sub: user.id, email: user.email, role: user.role };
@@ -351,6 +357,7 @@ export class AuthService {
         lastName: user.lastName,
         role: user.role,
         roleChosen: user.roleChosen,
+        city: user.city ?? null,
         workingHours: user.workingHours ?? null,
       },
     };

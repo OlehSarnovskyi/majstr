@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { SkipThrottle } from '@nestjs/throttler';
 import { MastersService } from './masters.service';
 
@@ -8,8 +8,13 @@ export class MastersController {
   constructor(private readonly mastersService: MastersService) {}
 
   @Get()
-  findAll() {
-    return this.mastersService.findAll();
+  findAll(@Query('city') city?: string, @Query('search') search?: string) {
+    return this.mastersService.findAll({ city, search });
+  }
+
+  @Get('cities')
+  getCities() {
+    return this.mastersService.findAll_cities();
   }
 
   @Get(':id')

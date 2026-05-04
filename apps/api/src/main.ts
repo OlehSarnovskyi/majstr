@@ -2,12 +2,19 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
+import { execSync } from 'child_process';
 import helmet from 'helmet';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const cookieParser = require('cookie-parser');
 import { AppModule } from './app/app.module';
 
 async function bootstrap() {
+  // Run pending migrations before app starts (idempotent, safe on every deploy)
+  try {
+    execSync('npx prisma migrate deploy', { stdio: 'inherit' });
+  } catch (e) {
+    Logger.error('Migration failed', e);
+  }
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);

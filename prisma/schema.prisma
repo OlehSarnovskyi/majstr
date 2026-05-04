@@ -17,6 +17,7 @@ model User {
   phone        String?
   avatar       String?
   bio          String?
+  city         String?
   workingHours Json?   @map("working_hours")
   role      Role     @default(CLIENT)
   roleChosen               Boolean   @default(false) @map("role_chosen")

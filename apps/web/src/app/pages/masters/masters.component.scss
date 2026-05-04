@@ -53,6 +53,15 @@
     overflow: hidden;
   }
 
+  &__footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  &__city,
   &__count {
     display: inline-flex;
     align-items: center;
