@@ -1,6 +1,7 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ApiService, Master } from '../../core/services/api.service';
+import { AuthService } from '../../core/services/auth.service';
 import { SeoService } from '../../core/services/seo.service';
 
 @Component({
@@ -14,6 +15,7 @@ export class MastersComponent implements OnInit {
   masters = signal<Master[]>([]);
   loading = signal(true);
 
+  auth = inject(AuthService);
   private api = inject(ApiService);
   private seo = inject(SeoService);
 
