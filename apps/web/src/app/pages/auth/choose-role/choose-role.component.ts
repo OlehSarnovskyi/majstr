@@ -108,7 +108,7 @@ export class ChooseRoleComponent {
         this.phoneError = 'Telefónne číslo je povinné pre majstrov';
         return;
       }
-      if (!/^\+?[\d\s\-\(\)]{9,20}$/.test(this.phone.trim())) {
+      if (!/^\+?[\d\s\-()]{9,20}$/.test(this.phone.trim())) {
         this.phoneError = 'Zadajte platné telefónne číslo (napr. +421 900 123 456)';
         return;
       }

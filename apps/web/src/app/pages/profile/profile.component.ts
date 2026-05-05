@@ -138,7 +138,7 @@ export class ProfileComponent implements OnInit {
     });
   }
 
-  private readonly PHONE_REGEX = /^\+?[\d\s\-\(\)]{9,20}$/;
+  private readonly PHONE_REGEX = /^\+?[\d\s\-()]{9,20}$/;
 
   get phoneError(): string {
     const trimmed = this.phone.trim();

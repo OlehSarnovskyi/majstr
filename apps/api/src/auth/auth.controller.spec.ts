@@ -42,6 +42,7 @@ function createPrismaMock() {
 const mockEmailService = {
   sendEmailVerification: jest.fn().mockResolvedValue(undefined),
   sendPasswordResetEmail: jest.fn().mockResolvedValue(undefined),
+  sendWelcomeEmail: jest.fn().mockResolvedValue(undefined),
   sendNewBookingNotification: jest.fn().mockResolvedValue(undefined),
   sendBookingStatusUpdate: jest.fn().mockResolvedValue(undefined),
 };
@@ -57,12 +58,13 @@ const existingUser = {
   firstName: 'John',
   lastName: 'Doe',
   role: 'CLIENT',
+  roleChosen: true,
   phone: null,
   avatar: null,
   bio: null,
   googleId: null,
-  emailVerified: false,
-  emailVerificationToken: 'verify-token',
+  emailVerified: true, // verified so login tests can pass
+  emailVerificationToken: null,
   resetToken: null,
   resetTokenExpiry: null,
   password: '', // filled in beforeAll
@@ -136,7 +138,7 @@ describe('AuthController (e2e)', () => {
       lastName: 'Smith',
     };
 
-    it('should return 201 with accessToken on successful registration', async () => {
+    it('should return 201 with a message (no token — user must verify email first)', async () => {
       prismaMock.user.findUnique.mockResolvedValue(null); // No existing user
       prismaMock.user.create.mockResolvedValue({
         id: 'new-user-id',
@@ -144,6 +146,7 @@ describe('AuthController (e2e)', () => {
         firstName: registerPayload.firstName,
         lastName: registerPayload.lastName,
         role: 'CLIENT',
+        roleChosen: false,
         password: 'hashed',
         phone: null,
         avatar: null,
@@ -160,9 +163,9 @@ describe('AuthController (e2e)', () => {
         .send(registerPayload)
         .expect(201);
 
-      expect(res.body).toHaveProperty('accessToken');
-      expect(typeof res.body.accessToken).toBe('string');
-      expect(res.body.user.email).toBe(registerPayload.email);
+      expect(res.body).toHaveProperty('message');
+      expect(res.body).toHaveProperty('email', registerPayload.email);
+      expect(res.body).not.toHaveProperty('accessToken');
     });
 
     it('should return 409 when a user with that email already exists', async () => {
@@ -292,7 +295,7 @@ describe('AuthController (e2e)', () => {
         .send({ email: 'nobody@example.com' })
         .expect(201);
 
-      expect(res.body.message).toContain('reset link');
+      expect(res.body.message).toContain('Reset link');
     });
 
     it('should return 400 when email is missing', async () => {

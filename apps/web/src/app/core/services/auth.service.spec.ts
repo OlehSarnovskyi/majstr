@@ -17,6 +17,7 @@ const mockUser: User = {
   firstName: 'John',
   lastName: 'Doe',
   role: 'CLIENT',
+  roleChosen: true,
 };
 
 const mockAuthResponse: AuthResponse = {
@@ -101,7 +102,8 @@ describe('AuthService', () => {
   });
 
   describe('register', () => {
-    it('should set token and user on successful registration', async () => {
+    it('should POST to /api/auth/register and return a message (no token issued until email verified)', async () => {
+      const mockResponse = { message: 'Registration successful. Please check your email to verify your account.', email: 'new@example.com' };
       const resultPromise = firstValueFrom(
         service.register({
           email: 'new@example.com',
@@ -113,13 +115,14 @@ describe('AuthService', () => {
 
       const req = httpMock.expectOne('/api/auth/register');
       expect(req.request.method).toBe('POST');
-      req.flush(mockAuthResponse);
+      req.flush(mockResponse);
 
       const result = await resultPromise;
 
-      expect(result).toEqual(mockAuthResponse);
-      expect(localStorage.getItem('accessToken')).toBe('mock-jwt-token');
-      expect(service.user()).toEqual(mockUser);
+      expect(result).toEqual(mockResponse);
+      // No token is stored — user must verify email first
+      expect(localStorage.getItem('accessToken')).toBeNull();
+      expect(service.user()).toBeNull();
     });
   });
 

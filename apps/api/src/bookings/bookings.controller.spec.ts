@@ -44,6 +44,7 @@ const mockEmailService = {
   sendBookingStatusUpdate: jest.fn().mockResolvedValue(undefined),
   sendEmailVerification: jest.fn().mockResolvedValue(undefined),
   sendPasswordResetEmail: jest.fn().mockResolvedValue(undefined),
+  sendWelcomeEmail: jest.fn().mockResolvedValue(undefined),
 };
 
 // ─── Test data ───────────────────────────────────────────────────────────────
@@ -141,6 +142,7 @@ describe('BookingsController (e2e)', () => {
     const validBookingPayload = {
       serviceId: testService.id,
       startTime: '', // filled per test
+      address: 'Mlynská 18, Bratislava',
     };
 
     it('should return 401 without a JWT token', async () => {
