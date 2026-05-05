@@ -1,6 +1,7 @@
 import { Component, OnInit, signal, input, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ApiService, Master } from '../../core/services/api.service';
+import { AuthService } from '../../core/services/auth.service';
 import { SeoService } from '../../core/services/seo.service';
 
 const BIO_LIMIT = 220;
@@ -20,6 +21,7 @@ export class MasterProfileComponent implements OnInit {
 
   readonly bioLimit = BIO_LIMIT;
 
+  auth = inject(AuthService);
   private api = inject(ApiService);
   private seo = inject(SeoService);
 

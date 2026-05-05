@@ -85,7 +85,9 @@
                   <span class="svc-card__price">&euro;{{ svc.price }}</span>
                 </div>
                 <p class="svc-card__desc">{{ svc.description }}</p>
-                <a [routerLink]="['/booking', svc.id]" class="btn btn--primary btn--sm">Rezervovať</a>
+                @if (!auth.isMaster()) {
+                  <a [routerLink]="['/booking', svc.id]" class="btn btn--primary btn--sm">Rezervovať</a>
+                }
               </div>
             </div>
           }
