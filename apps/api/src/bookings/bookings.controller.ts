@@ -23,6 +23,8 @@ export class BookingsController {
   constructor(private readonly bookingsService: BookingsService) {}
 
   @Post()
+  @UseGuards(RolesGuard)
+  @Roles(Role.CLIENT)
   create(
     @Request() req: { user: { id: string } },
     @Body() dto: CreateBookingDto

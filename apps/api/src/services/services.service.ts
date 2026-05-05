@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   ForbiddenException,
+  ConflictException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateServiceDto } from './dto/create-service.dto';
@@ -97,6 +98,19 @@ export class ServicesService {
 
     if (service.masterId !== masterId) {
       throw new ForbiddenException('You can only delete your own services');
+    }
+
+    const activeBookings = await this.prisma.booking.count({
+      where: {
+        serviceId: id,
+        status: { in: ['PENDING', 'CONFIRMED'] },
+      },
+    });
+
+    if (activeBookings > 0) {
+      throw new ConflictException(
+        'Cannot delete a service that has active bookings. Cancel or complete them first.'
+      );
     }
 
     await this.prisma.service.delete({ where: { id } });

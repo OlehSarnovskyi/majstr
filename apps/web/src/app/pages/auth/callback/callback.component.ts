@@ -1,6 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-auth-callback',
@@ -14,15 +15,26 @@ export class AuthCallbackComponent implements OnInit {
   private auth = inject(AuthService);
 
   async ngOnInit() {
-    const token = this.route.snapshot.queryParamMap.get('token');
-    const isNew = this.route.snapshot.queryParamMap.get('new') === '1';
+    const code = this.route.snapshot.queryParamMap.get('code');
 
-    if (!token) {
+    if (!code) {
       this.router.navigate(['/auth/login'], { replaceUrl: true });
       return;
     }
 
-    this.auth.handleGoogleCallback(token);
+    let isNew = false;
+    try {
+      const result = await firstValueFrom(this.auth.exchangeOAuthCode(code));
+      this.auth.handleGoogleCallback(result.accessToken);
+      isNew = result.isNewUser;
+    } catch {
+      this.router.navigate(['/auth/login'], {
+        replaceUrl: true,
+        queryParams: { error: 'oauth_error' },
+      });
+      return;
+    }
+
     await this.auth.whenReady;
 
     const user = this.auth.user();

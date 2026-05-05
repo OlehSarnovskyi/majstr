@@ -12,6 +12,7 @@ import {
   UseInterceptors,
   UploadedFile,
   BadRequestException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -32,6 +33,18 @@ import { GoogleAuthGuard } from './google-auth.guard';
 import { Role } from '@prisma/client';
 
 const UPLOADS_DIR = join(process.cwd(), 'uploads', 'avatars');
+
+// One-time OAuth code store: code → { accessToken, isNewUser, expiresAt }
+// Codes expire in 60 s and are deleted on first use.
+const oauthCodes = new Map<string, { accessToken: string; isNewUser: boolean; expiresAt: number }>();
+
+// Prune expired codes every 5 minutes so the Map doesn't grow unboundedly.
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, val] of oauthCodes) {
+    if (val.expiresAt < now) oauthCodes.delete(key);
+  }
+}, 5 * 60 * 1000);
 if (!existsSync(UPLOADS_DIR)) {
   mkdirSync(UPLOADS_DIR, { recursive: true });
 }
@@ -124,11 +137,29 @@ export class AuthController {
 
     const result = await this.authService.googleLogin(req.user);
 
-    // Pass token directly in URL — no cross-domain cookie needed
-    const params = new URLSearchParams({ token: result.accessToken });
-    if (result.isNewUser) params.set('new', '1');
+    // Issue a short-lived one-time code instead of putting the JWT in the URL.
+    // The frontend exchanges the code for the token via POST /auth/exchange-code.
+    const code = crypto.randomBytes(32).toString('hex');
+    oauthCodes.set(code, {
+      accessToken: result.accessToken,
+      isNewUser: result.isNewUser,
+      expiresAt: Date.now() + 60_000, // 60 seconds
+    });
 
+    const params = new URLSearchParams({ code });
     res.redirect(`${frontendUrl}/auth/callback?${params}`);
+  }
+
+  /** Exchange a one-time OAuth code for a JWT. The code is single-use and expires in 60 s. */
+  @Post('exchange-code')
+  exchangeCode(@Body() body: { code: string }) {
+    const entry = body.code && oauthCodes.get(body.code);
+    if (!entry || entry.expiresAt < Date.now()) {
+      oauthCodes.delete(body.code); // clean up expired entry if present
+      throw new UnauthorizedException('Invalid or expired code');
+    }
+    oauthCodes.delete(body.code); // single-use
+    return { accessToken: entry.accessToken, isNewUser: entry.isNewUser };
   }
 
   @UseGuards(JwtAuthGuard)

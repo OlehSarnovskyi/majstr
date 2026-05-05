@@ -66,6 +66,13 @@ export class AuthService {
     window.location.href = '/api/auth/google';
   }
 
+  exchangeOAuthCode(code: string) {
+    return this.http.post<{ accessToken: string; isNewUser: boolean }>(
+      '/api/auth/exchange-code',
+      { code }
+    );
+  }
+
   handleGoogleCallback(token: string) {
     localStorage.setItem('accessToken', token);
     this._userLoaded = this.loadUser();
