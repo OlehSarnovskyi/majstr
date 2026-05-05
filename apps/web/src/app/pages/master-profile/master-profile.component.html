@@ -1,91 +1,98 @@
 <div class="container">
+
   @if (loading()) {
-    <div class="profile-skeleton">
-      <div class="skeleton" style="width: 96px; height: 96px; border-radius: 50%"></div>
-      <div class="skeleton" style="width: 200px; height: 28px"></div>
-      <div class="skeleton" style="width: 300px; height: 16px"></div>
-    </div>
-  } @else if (master(); as m) {
-    <div class="profile-layout">
-
-      <!-- Left sidebar: avatar + info -->
-      <aside class="profile-sidebar">
-        <div class="card">
-          <div class="card__body profile-sidebar__body">
-
-            <div class="profile__avatar">
-              @if (m.avatar) {
-                <img [src]="m.avatar" [alt]="m.firstName" />
-              } @else {
-                <span class="profile__initials">{{ getInitials(m) }}</span>
-              }
-            </div>
-
-            <h1 class="profile__name">{{ m.firstName }} {{ m.lastName }}</h1>
-
-            @if (m.bio) {
-              <p class="profile__bio">{{ m.bio }}</p>
-            }
-
-            <div class="profile__meta">
-              @if (m.city) {
-                <div class="profile__meta-item">
-                  <span class="material-icons-outlined">location_on</span>
-                  <span>{{ m.city }}</span>
-                </div>
-              }
-              <div class="profile__meta-item">
-                <span class="material-icons-outlined">build</span>
-                <span>{{ m.services?.length || 0 }} služieb</span>
-              </div>
-              @if (getWorkingDays(m)) {
-                <div class="profile__meta-item">
-                  <span class="material-icons-outlined">calendar_today</span>
-                  <span>{{ getWorkingDays(m) }}</span>
-                </div>
-              }
-              @if (getMemberSince(m)) {
-                <div class="profile__meta-item">
-                  <span class="material-icons-outlined">verified</span>
-                  <span>Na platforme od {{ getMemberSince(m) }}</span>
-                </div>
-              }
-            </div>
-
-          </div>
+    <div class="hero-skeleton card">
+      <div class="card__body hero-skeleton__body">
+        <div class="skeleton skeleton--circle"></div>
+        <div class="hero-skeleton__lines">
+          <div class="skeleton" style="width: 220px; height: 28px"></div>
+          <div class="skeleton" style="width: 320px; height: 16px; margin-top: 10px"></div>
+          <div class="skeleton" style="width: 260px; height: 14px; margin-top: 8px"></div>
         </div>
-      </aside>
+      </div>
+    </div>
 
-      <!-- Right: services -->
-      <main class="profile-main">
-        <h2 class="profile-main__title">Služby</h2>
+  } @else if (master(); as m) {
 
-        @if (!m.services || m.services.length === 0) {
-          <div class="empty-services">
-            <span class="material-icons-outlined">home_repair_service</span>
-            <p class="text-muted">Zatiaľ žiadne služby.</p>
-          </div>
-        } @else {
-          <div class="services-grid">
-            @for (svc of m.services; track svc.id) {
-              <div class="svc-card card card--hover">
-                <div class="card__body">
-                  <div class="svc-card__top">
-                    <h3>{{ svc.name }}</h3>
-                    <span class="svc-card__price">&euro;{{ svc.price }}</span>
-                  </div>
-                  <p class="svc-card__desc">{{ svc.description }}</p>
-                  <div class="svc-card__footer">
-                    <a [routerLink]="['/booking', svc.id]" class="btn btn--primary btn--sm">Rezervovať</a>
-                  </div>
-                </div>
-              </div>
+    <!-- ── Hero card ───────────────────────────────────────────────── -->
+    <div class="hero card">
+      <div class="card__body hero__body">
+
+        <div class="hero__avatar">
+          @if (m.avatar) {
+            <img [src]="m.avatar" [alt]="m.firstName" />
+          } @else {
+            <span class="hero__initials">{{ getInitials(m) }}</span>
+          }
+        </div>
+
+        <div class="hero__info">
+          <h1 class="hero__name">{{ m.firstName }} {{ m.lastName }}</h1>
+
+          <!-- Meta chips -->
+          <div class="hero__chips">
+            @if (m.city) {
+              <span class="chip">
+                <span class="material-icons-outlined">location_on</span>{{ m.city }}
+              </span>
+            }
+            <span class="chip">
+              <span class="material-icons-outlined">build</span>{{ m.services?.length || 0 }} služieb
+            </span>
+            @if (getWorkingDays(m)) {
+              <span class="chip">
+                <span class="material-icons-outlined">calendar_today</span>{{ getWorkingDays(m) }}
+              </span>
+            }
+            @if (getMemberSince(m)) {
+              <span class="chip chip--verified">
+                <span class="material-icons-outlined">verified</span>od {{ getMemberSince(m) }}
+              </span>
             }
           </div>
-        }
-      </main>
 
+          <!-- Bio -->
+          @if (m.bio) {
+            <p class="hero__bio">{{ bioText(m) }}</p>
+            @if (m.bio.length > bioLimit) {
+              <button class="btn-link" (click)="toggleBio()">
+                {{ bioExpanded() ? 'Zobraziť menej' : 'Zobraziť viac' }}
+                <span class="material-icons-outlined">{{ bioExpanded() ? 'expand_less' : 'expand_more' }}</span>
+              </button>
+            }
+          }
+        </div>
+
+      </div>
     </div>
+
+    <!-- ── Services ───────────────────────────────────────────────── -->
+    <section class="services-section">
+      <h2 class="services-section__title">Služby</h2>
+
+      @if (!m.services || m.services.length === 0) {
+        <div class="empty-services">
+          <span class="material-icons-outlined">home_repair_service</span>
+          <p class="text-muted">Zatiaľ žiadne služby.</p>
+        </div>
+      } @else {
+        <div class="services-grid">
+          @for (svc of m.services; track svc.id) {
+            <div class="svc-card card card--hover">
+              <div class="card__body">
+                <div class="svc-card__top">
+                  <h3 class="svc-card__name">{{ svc.name }}</h3>
+                  <span class="svc-card__price">&euro;{{ svc.price }}</span>
+                </div>
+                <p class="svc-card__desc">{{ svc.description }}</p>
+                <a [routerLink]="['/booking', svc.id]" class="btn btn--primary btn--sm">Rezervovať</a>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </section>
+
   } @else {
     <div class="empty">
       <span class="material-icons-outlined">person_off</span>
@@ -93,4 +100,5 @@
       <a routerLink="/" class="btn btn--secondary mt-2">Na úvod</a>
     </div>
   }
+
 </div>

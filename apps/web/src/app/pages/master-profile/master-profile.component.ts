@@ -3,6 +3,8 @@ import { RouterLink } from '@angular/router';
 import { ApiService, Master } from '../../core/services/api.service';
 import { SeoService } from '../../core/services/seo.service';
 
+const BIO_LIMIT = 220;
+
 @Component({
   selector: 'app-master-profile',
   standalone: true,
@@ -14,6 +16,9 @@ export class MasterProfileComponent implements OnInit {
   id = input.required<string>();
   master = signal<Master | null>(null);
   loading = signal(true);
+  bioExpanded = signal(false);
+
+  readonly bioLimit = BIO_LIMIT;
 
   private api = inject(ApiService);
   private seo = inject(SeoService);
@@ -51,5 +56,15 @@ export class MasterProfileComponent implements OnInit {
     if (!m.createdAt) return '';
     const d = new Date(m.createdAt);
     return d.toLocaleDateString('sk-SK', { month: 'long', year: 'numeric' });
+  }
+
+  bioText(m: Master): string {
+    if (!m.bio) return '';
+    if (this.bioExpanded() || m.bio.length <= this.bioLimit) return m.bio;
+    return m.bio.slice(0, this.bioLimit).trimEnd() + '…';
+  }
+
+  toggleBio() {
+    this.bioExpanded.set(!this.bioExpanded());
   }
 }
