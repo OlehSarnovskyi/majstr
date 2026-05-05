@@ -201,7 +201,7 @@ describe('BookingsController (e2e)', () => {
       const res = await supertest(app.getHttpServer())
         .post('/api/bookings')
         .set('Authorization', `Bearer ${token}`)
-        .send({ serviceId: testService.id, startTime: start })
+        .send({ serviceId: testService.id, startTime: start, address: 'Mlynská 18, Bratislava' })
         .expect(201);
 
       expect(res.body).toHaveProperty('id', 'booking-id-1');

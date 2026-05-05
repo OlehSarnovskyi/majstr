@@ -39,12 +39,13 @@ const UPLOADS_DIR = join(process.cwd(), 'uploads', 'avatars');
 const oauthCodes = new Map<string, { accessToken: string; isNewUser: boolean; expiresAt: number }>();
 
 // Prune expired codes every 5 minutes so the Map doesn't grow unboundedly.
+// .unref() lets Node / Jest exit without waiting for this timer.
 setInterval(() => {
   const now = Date.now();
   for (const [key, val] of oauthCodes) {
     if (val.expiresAt < now) oauthCodes.delete(key);
   }
-}, 5 * 60 * 1000);
+}, 5 * 60 * 1000).unref();
 if (!existsSync(UPLOADS_DIR)) {
   mkdirSync(UPLOADS_DIR, { recursive: true });
 }
