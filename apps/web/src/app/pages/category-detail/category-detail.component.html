@@ -44,7 +44,9 @@
               </div>
               <div class="service-card__action">
                 <span class="service-card__price">&euro;{{ svc.price }}</span>
-                <a [routerLink]="['/booking', svc.id]" class="btn btn--primary btn--sm">Rezervovať</a>
+                @if (!auth.isMaster()) {
+                  <a [routerLink]="['/booking', svc.id]" class="btn btn--primary btn--sm">Rezervovať</a>
+                }
               </div>
             </div>
           </div>
