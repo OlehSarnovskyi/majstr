@@ -17,9 +17,9 @@ import { SeedModule } from '../seed/seed.module';
 @Module({
   imports: [
     ThrottlerModule.forRoot([
-      { name: 'short', ttl: 1000,   limit: 30  }, // 30 req/sec  — SPA may fire several requests at once
-      { name: 'long',  ttl: 60000,  limit: 200 }, // 200 req/min — comfortable for active browsing
-      { name: 'auth',  ttl: 900000, limit: 10  }, // 10 req/15min — overridden per auth endpoint
+      // Only auth endpoints are throttled — all browsing endpoints use @SkipThrottle().
+      // This single bucket is the global fallback; auth routes override it with stricter limits.
+      { name: 'auth', ttl: 900000, limit: 50 }, // 50 req/15min fallback
     ]),
     PrismaModule,
     SeedModule,
