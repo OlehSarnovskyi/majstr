@@ -90,6 +90,7 @@ describe('authGuard', () => {
             firstName: 'John',
             lastName: 'Doe',
             role: 'CLIENT',
+            roleChosen: true,
           },
         });
 

@@ -160,6 +160,7 @@ describe('LoginComponent', () => {
           firstName: 'John',
           lastName: 'Doe',
           role: 'CLIENT',
+          roleChosen: true,
         },
       };
       vi.mocked(mockAuthService.login).mockReturnValue(of(mockResponse));
@@ -195,6 +196,7 @@ describe('LoginComponent', () => {
             firstName: 'John',
             lastName: 'Doe',
             role: 'CLIENT',
+            roleChosen: true,
           },
         })
       );
