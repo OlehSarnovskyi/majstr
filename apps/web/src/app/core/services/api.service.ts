@@ -61,6 +61,10 @@ export interface Booking {
   status: string;
   note: string | null;
   address: string | null;
+  /** Snapshot of Service.price at booking creation. Always a number or null (never a Decimal string). */
+  estimatedPrice: number | null;
+  /** Final price entered by master on COMPLETED. null if not provided. */
+  actualPrice: number | null;
   service: Service;
   client?: { id: string; firstName: string; lastName: string; email?: string | null; phone?: string | null };
   master?: Master;
@@ -141,7 +145,9 @@ export class ApiService {
     return this.http.get<Booking[]>('/api/bookings/my');
   }
 
-  updateBookingStatus(id: string, status: string) {
-    return this.http.patch<Booking>(`/api/bookings/${id}/status`, { status });
+  updateBookingStatus(id: string, status: string, actualPrice?: number | null) {
+    const body: Record<string, unknown> = { status };
+    if (actualPrice != null) body['actualPrice'] = actualPrice;
+    return this.http.patch<Booking>(`/api/bookings/${id}/status`, body);
   }
 }

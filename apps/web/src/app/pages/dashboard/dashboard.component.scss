@@ -240,6 +240,97 @@ select.form-field__input {
   &:hover { background: #FEF2F2; }
 }
 
+// ─── Price display ────────────────────────────────────────────────────────────
+
+.booking-card__price {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.875rem;
+  color: var(--color-text-light);
+  margin-top: 8px;
+
+  .material-icons-outlined { font-size: 16px; color: var(--color-primary); }
+
+  strong { color: var(--color-text); font-weight: 600; }
+}
+
+.booking-card__price-note {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  margin-left: 2px;
+}
+
+// ─── Complete-booking modal ───────────────────────────────────────────────────
+// Same visual pattern as ConfirmComponent — overlay + centered card.
+
+.confirm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 2000;
+  animation: fadeIn 0.15s ease-out;
+}
+
+.confirm-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2001;
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  width: min(90vw, 400px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  animation: scaleIn 0.2s ease-out;
+
+  h3 { font-size: 1.125rem; margin-bottom: 8px; }
+
+  p {
+    font-size: 0.875rem;
+    color: var(--color-text-light);
+    line-height: 1.5;
+  }
+}
+
+.confirm-modal__actions {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 8px;
+
+  .btn { width: 100%; justify-content: center; }
+
+  @media (min-width: 400px) {
+    flex-direction: row;
+    justify-content: flex-end;
+    .btn { width: auto; flex: 1; }
+  }
+}
+
+.complete-modal {
+  width: min(90vw, 460px);
+
+  .form-field__hint {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    margin-top: 4px;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { transform: translate(-50%, -50%) scale(0.95); opacity: 0; }
+  to   { transform: translate(-50%, -50%) scale(1);    opacity: 1; }
+}
+
+// ─── Responsive ───────────────────────────────────────────────────────────────
+
 @media (max-width: 640px) {
   .dash-header { flex-direction: column; gap: 16px; align-items: flex-start; }
   .booking-card__top { flex-wrap: wrap; }

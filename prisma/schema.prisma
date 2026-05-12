@@ -70,11 +70,13 @@ model Booking {
   serviceId String        @map("service_id")
   startTime DateTime      @map("start_time")
   endTime   DateTime      @map("end_time")
-  status    BookingStatus @default(PENDING)
-  note      String?
-  address   String?
-  createdAt DateTime      @default(now()) @map("created_at")
-  updatedAt DateTime      @updatedAt @map("updated_at")
+  status         BookingStatus @default(PENDING)
+  note           String?
+  address        String?
+  estimatedPrice Decimal?      @db.Decimal(10, 2) @map("estimated_price")
+  actualPrice    Decimal?      @db.Decimal(10, 2) @map("actual_price")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
 
   client  User    @relation("ClientBookings", fields: [clientId], references: [id])
   master  User    @relation("MasterBookings", fields: [masterId], references: [id])

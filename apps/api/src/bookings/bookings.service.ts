@@ -5,10 +5,22 @@ import {
   ForbiddenException,
   BadRequestException,
 } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { EmailService } from '../email/email.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { BookingStatus } from '@prisma/client';
+
+// ─── Prisma result types ──────────────────────────────────────────────────────
+
+// The shape returned by booking queries that include service, client, master.
+type BookingWithRelations = Prisma.BookingGetPayload<{
+  include: {
+    service: true;
+    client: { select: { id: true; firstName: true; lastName: true; email: true; phone: true } };
+    master: { select: { id: true; firstName: true; lastName: true; email: true; phone: true; avatar: true } };
+  };
+}>;
 
 @Injectable()
 export class BookingsService {
@@ -18,6 +30,26 @@ export class BookingsService {
     private readonly prisma: PrismaService,
     private readonly emailService: EmailService
   ) {}
+
+  // ─── Helpers ───────────────────────────────────────────────────────────────
+
+  /**
+   * Converts Prisma Decimal fields to numbers so JSON responses always
+   * contain numeric values instead of strings.
+   */
+  private serializeBooking(booking: BookingWithRelations) {
+    return {
+      ...booking,
+      estimatedPrice: booking.estimatedPrice != null
+        ? Number(booking.estimatedPrice)
+        : null,
+      actualPrice: booking.actualPrice != null
+        ? Number(booking.actualPrice)
+        : null,
+    };
+  }
+
+  // ─── Create ────────────────────────────────────────────────────────────────
 
   async create(clientId: string, dto: CreateBookingDto) {
     const service = await this.prisma.service.findUnique({
@@ -89,14 +121,16 @@ export class BookingsService {
         endTime,
         address: dto.address,
         note: dto.note,
+        // Snapshot of service.price at booking creation — frozen forever.
+        estimatedPrice: service.price,
       },
       include: {
         service: true,
         client: {
-          select: { id: true, firstName: true, lastName: true, email: true },
+          select: { id: true, firstName: true, lastName: true, email: true, phone: true },
         },
         master: {
-          select: { id: true, firstName: true, lastName: true, email: true },
+          select: { id: true, firstName: true, lastName: true, email: true, phone: true, avatar: true },
         },
       },
     });
@@ -105,8 +139,10 @@ export class BookingsService {
       this.logger.error('Failed to send new booking notification', err)
     );
 
-    return booking;
+    return this.serializeBooking(booking);
   }
+
+  // ─── Read ──────────────────────────────────────────────────────────────────
 
   async findClientBookings(clientId: string) {
     const bookings = await this.prisma.booking.findMany({
@@ -120,21 +156,26 @@ export class BookingsService {
             lastName: true,
             avatar: true,
             phone: true,
+            email: true,
           },
+        },
+        client: {
+          select: { id: true, firstName: true, lastName: true, email: true, phone: true },
         },
       },
       orderBy: { startTime: 'desc' },
     });
 
-    // Show master phone to client once booking exists (PENDING or CONFIRMED)
-    // so client can contact master if needed before confirmation
-    return bookings.map((b) => ({
-      ...b,
-      master: {
-        ...b.master,
-        phone: ['PENDING', 'CONFIRMED'].includes(b.status) ? b.master?.phone : null,
-      },
-    }));
+    return bookings.map((b) =>
+      this.serializeBooking({
+        ...b,
+        master: {
+          ...b.master,
+          // Show master phone to client once booking exists (PENDING or CONFIRMED)
+          phone: ['PENDING', 'CONFIRMED'].includes(b.status) ? b.master?.phone : null,
+        },
+      } as BookingWithRelations)
+    );
   }
 
   async findMasterBookings(masterId: string) {
@@ -151,25 +192,33 @@ export class BookingsService {
             email: true,
           },
         },
+        master: {
+          select: { id: true, firstName: true, lastName: true, email: true, phone: true, avatar: true },
+        },
       },
       orderBy: { startTime: 'desc' },
     });
 
-    // Hide client phone and email until booking is CONFIRMED
-    return bookings.map((b) => ({
-      ...b,
-      client: {
-        ...b.client,
-        phone: b.status === 'CONFIRMED' ? b.client?.phone : null,
-        email: b.status === 'CONFIRMED' ? b.client?.email : null,
-      },
-    }));
+    return bookings.map((b) =>
+      this.serializeBooking({
+        ...b,
+        client: {
+          ...b.client,
+          // Hide client phone and email until booking is CONFIRMED
+          phone: b.status === 'CONFIRMED' ? b.client?.phone : null,
+          email: b.status === 'CONFIRMED' ? b.client?.email : null,
+        },
+      } as BookingWithRelations)
+    );
   }
+
+  // ─── Update status ─────────────────────────────────────────────────────────
 
   async updateStatus(
     bookingId: string,
     userId: string,
-    status: BookingStatus
+    status: BookingStatus,
+    actualPrice?: number
   ) {
     const booking = await this.prisma.booking.findUnique({
       where: { id: bookingId },
@@ -184,8 +233,12 @@ export class BookingsService {
       throw new NotFoundException('Booking not found');
     }
 
+    // Idempotency guard — before the state machine, for a clearer error message.
+    if (booking.status === BookingStatus.COMPLETED) {
+      throw new BadRequestException('Booking already completed');
+    }
+
     // State machine: PENDING → CONFIRMED|CANCELLED, CONFIRMED → COMPLETED|CANCELLED
-    // Terminal states (COMPLETED, CANCELLED) cannot transition further.
     const validTransitions: Record<BookingStatus, BookingStatus[]> = {
       [BookingStatus.PENDING]: [BookingStatus.CONFIRMED, BookingStatus.CANCELLED],
       [BookingStatus.CONFIRMED]: [BookingStatus.COMPLETED, BookingStatus.CANCELLED],
@@ -199,11 +252,13 @@ export class BookingsService {
       );
     }
 
+    // Authorization
     if (status === BookingStatus.CANCELLED) {
       if (booking.clientId !== userId && booking.masterId !== userId) {
         throw new ForbiddenException();
       }
     } else {
+      // CONFIRMED and COMPLETED — only the assigned master
       if (booking.masterId !== userId) {
         throw new ForbiddenException(
           'Only the master can confirm or complete bookings'
@@ -220,14 +275,20 @@ export class BookingsService {
 
     const updated = await this.prisma.booking.update({
       where: { id: bookingId },
-      data: { status },
+      data: {
+        status,
+        // actualPrice only stored on COMPLETED; ignored for other transitions.
+        ...(status === BookingStatus.COMPLETED && actualPrice != null
+          ? { actualPrice }
+          : {}),
+      },
       include: {
         service: true,
         client: {
-          select: { id: true, firstName: true, lastName: true, email: true },
+          select: { id: true, firstName: true, lastName: true, email: true, phone: true },
         },
         master: {
-          select: { id: true, firstName: true, lastName: true, email: true },
+          select: { id: true, firstName: true, lastName: true, email: true, phone: true, avatar: true },
         },
       },
     });
@@ -236,6 +297,6 @@ export class BookingsService {
       this.logger.error('Failed to send booking status update email', err)
     );
 
-    return updated;
+    return this.serializeBooking(updated);
   }
 }

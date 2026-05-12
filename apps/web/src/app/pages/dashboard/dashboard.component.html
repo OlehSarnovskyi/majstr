@@ -1,3 +1,33 @@
+<!-- Complete-booking modal -->
+@if (showCompleteModal()) {
+  <div class="confirm-overlay" (click)="closeCompleteModal()" (keydown.escape)="closeCompleteModal()" tabindex="-1" role="dialog" aria-label="Dokončiť rezerváciu"></div>
+  <div class="confirm-modal complete-modal" role="dialog" aria-modal="true" aria-labelledby="complete-modal-title">
+    <h3 id="complete-modal-title">Označiť ako dokončené</h3>
+    <p>Rezervácia bude označená ako dokončená. Voliteľne môžete uviesť finálnu cenu.</p>
+    <div class="form-field mt-2">
+      <label class="form-field__label" for="actual-price">Aká bola finálna cena? (€)</label>
+      <input
+        id="actual-price"
+        type="number"
+        class="form-field__input"
+        [ngModel]="actualPriceInput()"
+        (ngModelChange)="actualPriceInput.set($event || null)"
+        min="0.01"
+        max="50000"
+        step="0.01"
+        placeholder="napr. 85"
+      />
+      <span class="form-field__hint">Voliteľné. Pomôže nám zlepšiť odhad cien.</span>
+    </div>
+    <div class="confirm-modal__actions mt-2">
+      <button class="btn btn--ghost" (click)="closeCompleteModal()" [disabled]="completing()">Zrušiť</button>
+      <button class="btn btn--primary" (click)="confirmComplete()" [disabled]="completing()">
+        {{ completing() ? 'Ukladá sa...' : 'Označiť ako dokončené' }}
+      </button>
+    </div>
+  </div>
+}
+
 <div class="container">
   <div class="dash-header">
     <h1>Nástenka</h1>
@@ -74,7 +104,15 @@
                   }
                 </div>
 
-                <!-- Row 4: actions -->
+                <!-- Row 4: estimated price -->
+                @if (b.estimatedPrice != null) {
+                  <p class="booking-card__price">
+                    <span class="material-icons-outlined">payments</span>
+                    Orientačná cena: <strong>{{ b.estimatedPrice | number:'1.2-2' }} €</strong>
+                  </p>
+                }
+
+                <!-- Row 5: actions -->
                 <div class="booking-card__footer">
                   @if (auth.isMaster()) {
                     <button class="btn btn--primary btn--sm" (click)="updateStatus(b.id, 'CONFIRMED')">Potvrdiť</button>
@@ -148,6 +186,24 @@
                   }
                 </div>
 
+                <!-- Price display -->
+                @if (b.status === 'COMPLETED') {
+                  <p class="booking-card__price">
+                    <span class="material-icons-outlined">payments</span>
+                    @if (b.actualPrice != null) {
+                      Konečná cena: <strong>{{ b.actualPrice | number:'1.2-2' }} €</strong>
+                    } @else if (b.estimatedPrice != null) {
+                      Orientačná cena: <strong>{{ b.estimatedPrice | number:'1.2-2' }} €</strong>
+                      <span class="booking-card__price-note">(konečná cena nebola uvedená)</span>
+                    }
+                  </p>
+                } @else if (b.estimatedPrice != null) {
+                  <p class="booking-card__price">
+                    <span class="material-icons-outlined">payments</span>
+                    Orientačná cena: <strong>{{ b.estimatedPrice | number:'1.2-2' }} €</strong>
+                  </p>
+                }
+
                 <!-- Row 4: actions -->
                 @if (b.status === 'CONFIRMED') {
                   <div class="booking-card__footer">
@@ -161,7 +217,7 @@
                     </div>
                     <div class="booking-card__action-btns">
                       @if (auth.isMaster() && isPast(b.startTime)) {
-                        <button class="btn btn--primary btn--sm" (click)="updateStatus(b.id, 'COMPLETED')">Dokončiť</button>
+                        <button class="btn btn--primary btn--sm" (click)="openCompleteModal(b.id)">Označiť ako dokončené</button>
                       }
                       <button class="btn btn--ghost btn--sm" (click)="updateStatus(b.id, 'CANCELLED')">Zrušiť</button>
                     </div>

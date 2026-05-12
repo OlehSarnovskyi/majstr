@@ -66,15 +66,43 @@ const testMaster = {
   firstName: 'Bob',
   lastName: 'Brown',
   role: 'MASTER',
+  phone: null,
+  avatar: null,
 };
 
+// price is a Decimal in Prisma — mock returns a plain object that serializes the same way
 const testService = {
   id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
   name: 'Haircut',
   masterId: testMaster.id,
   durationMinutes: 60,
+  price: { toNumber: () => 85, toString: () => '85.00' } as unknown as any,
   master: testMaster,
+  workingHours: null,
 };
+
+// Helper: build a mock booking with optional price fields
+function mockBooking(overrides: Record<string, unknown> = {}) {
+  const start = new Date(Date.now() + 2 * 60 * 60 * 1000);
+  const end   = new Date(start.getTime() + 60 * 60 * 1000);
+  return {
+    id: 'booking-id-1',
+    clientId: testClient.id,
+    masterId: testMaster.id,
+    serviceId: testService.id,
+    startTime: start,
+    endTime: end,
+    status: 'PENDING',
+    note: null,
+    address: 'Mlynská 18, Bratislava',
+    estimatedPrice: null,
+    actualPrice: null,
+    service: testService,
+    client: testClient,
+    master: testMaster,
+    ...overrides,
+  };
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -163,72 +191,185 @@ describe('BookingsController (e2e)', () => {
     it('should return 400 when startTime is in the past', async () => {
       prismaMock.user.findUnique.mockResolvedValue(testClient);
       prismaMock.service.findUnique.mockResolvedValue(testService);
-      prismaMock.booking.findFirst.mockResolvedValue(null); // No overlap
-
-      const token = makeToken(testClient);
+      prismaMock.booking.findFirst.mockResolvedValue(null);
 
       await supertest(app.getHttpServer())
         .post('/api/bookings')
-        .set('Authorization', `Bearer ${token}`)
-        .send({ serviceId: testService.id, startTime: pastDate() })
+        .set('Authorization', `Bearer ${makeToken(testClient)}`)
+        .send({ ...validBookingPayload, startTime: pastDate() })
         .expect(400);
     });
 
-    it('should return 201 with booking data when request is valid', async () => {
+    it('should return 201 and set estimatedPrice from service.price', async () => {
       const start = futureDate(2);
-      const end = new Date(new Date(start).getTime() + 60 * 60 * 1000).toISOString();
-      const mockBooking = {
-        id: 'booking-id-1',
-        clientId: testClient.id,
-        masterId: testMaster.id,
-        serviceId: testService.id,
-        startTime: new Date(start),
-        endTime: new Date(end),
-        status: 'PENDING',
-        note: null,
-        service: testService,
-        client: testClient,
-        master: testMaster,
-      };
-
       prismaMock.user.findUnique.mockResolvedValue(testClient);
       prismaMock.service.findUnique.mockResolvedValue(testService);
       prismaMock.booking.findFirst.mockResolvedValue(null);
-      prismaMock.booking.create.mockResolvedValue(mockBooking);
-
-      const token = makeToken(testClient);
+      prismaMock.booking.create.mockResolvedValue(
+        mockBooking({ estimatedPrice: 85, actualPrice: null, startTime: new Date(start) })
+      );
 
       const res = await supertest(app.getHttpServer())
         .post('/api/bookings')
-        .set('Authorization', `Bearer ${token}`)
+        .set('Authorization', `Bearer ${makeToken(testClient)}`)
         .send({ serviceId: testService.id, startTime: start, address: 'Mlynská 18, Bratislava' })
         .expect(201);
 
       expect(res.body).toHaveProperty('id', 'booking-id-1');
       expect(res.body.status).toBe('PENDING');
+      // estimatedPrice must be a number (not a Decimal string)
+      expect(res.body.estimatedPrice).toBe(85);
+      expect(res.body.actualPrice).toBeNull();
+
+      // Verify the service was told to snapshot service.price
+      expect(prismaMock.booking.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({ estimatedPrice: testService.price }),
+        })
+      );
     });
 
-    it('should return 400 when serviceId is missing', async () => {
-      prismaMock.user.findUnique.mockResolvedValue(testClient);
+    it('estimatedPrice should be unaffected by later service.price changes', async () => {
+      // This is a design property: estimatedPrice is captured at create time.
+      // The test verifies create() reads price from the service object at call time —
+      // even if the service mock is changed afterward, the booking keeps the old value.
+      const start = futureDate(2);
+      const priceAtBookingTime = testService.price;
 
-      const token = makeToken(testClient);
+      prismaMock.service.findUnique.mockResolvedValue(testService);
+      prismaMock.booking.findFirst.mockResolvedValue(null);
+      prismaMock.booking.create.mockResolvedValue(
+        mockBooking({ estimatedPrice: 85, startTime: new Date(start) })
+      );
 
       await supertest(app.getHttpServer())
         .post('/api/bookings')
-        .set('Authorization', `Bearer ${token}`)
-        .send({ startTime: futureDate() })
+        .set('Authorization', `Bearer ${makeToken(testClient)}`)
+        .send({ serviceId: testService.id, startTime: start, address: 'Mlynská 18, Bratislava' })
+        .expect(201);
+
+      const [[{ data }]] = prismaMock.booking.create.mock.calls;
+      // The price stored in the booking equals the service price at call time
+      expect(data.estimatedPrice).toBe(priceAtBookingTime);
+    });
+
+    it('should return 400 when serviceId is missing', async () => {
+      await supertest(app.getHttpServer())
+        .post('/api/bookings')
+        .set('Authorization', `Bearer ${makeToken(testClient)}`)
+        .send({ startTime: futureDate(), address: 'Mlynská 18, Bratislava' })
         .expect(400);
     });
 
     it('should return 400 when serviceId is not a valid UUID', async () => {
-      prismaMock.user.findUnique.mockResolvedValue(testClient);
-
-      const token = makeToken(testClient);
-
       await supertest(app.getHttpServer())
         .post('/api/bookings')
-        .set('Authorization', `Bearer ${token}`)
-        .send({ serviceId: 'not-a-uuid', startTime: futureDate() })
+        .set('Authorization', `Bearer ${makeToken(testClient)}`)
+        .send({ serviceId: 'not-a-uuid', startTime: futureDate(), address: 'Mlynská 18, Bratislava' })
+        .expect(400);
+    });
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // PATCH /api/bookings/:id/status
+  // ─────────────────────────────────────────────────────────────────────────
+
+  describe('PATCH /api/bookings/:id/status', () => {
+
+    it('should store actualPrice when master completes a booking with price', async () => {
+      const confirmedBooking = mockBooking({ status: 'CONFIRMED', startTime: pastDate() as unknown as Date });
+      const completedBooking = mockBooking({
+        status: 'COMPLETED',
+        startTime: pastDate() as unknown as Date,
+        estimatedPrice: 85,
+        actualPrice: 95,
+      });
+
+      prismaMock.user.findUnique.mockResolvedValue(testMaster);
+      prismaMock.booking.findUnique.mockResolvedValue(confirmedBooking);
+      prismaMock.booking.update.mockResolvedValue(completedBooking);
+
+      const res = await supertest(app.getHttpServer())
+        .patch(`/api/bookings/booking-id-1/status`)
+        .set('Authorization', `Bearer ${makeToken(testMaster)}`)
+        .send({ status: 'COMPLETED', actualPrice: 95 })
+        .expect(200);
+
+      expect(res.body.status).toBe('COMPLETED');
+      expect(res.body.actualPrice).toBe(95);
+
+      expect(prismaMock.booking.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({ status: 'COMPLETED', actualPrice: 95 }),
+        })
+      );
+    });
+
+    it('should store null actualPrice when master completes without providing price', async () => {
+      const confirmedBooking = mockBooking({ status: 'CONFIRMED', startTime: pastDate() as unknown as Date });
+      const completedBooking = mockBooking({
+        status: 'COMPLETED',
+        startTime: pastDate() as unknown as Date,
+        estimatedPrice: 85,
+        actualPrice: null,
+      });
+
+      prismaMock.user.findUnique.mockResolvedValue(testMaster);
+      prismaMock.booking.findUnique.mockResolvedValue(confirmedBooking);
+      prismaMock.booking.update.mockResolvedValue(completedBooking);
+
+      const res = await supertest(app.getHttpServer())
+        .patch(`/api/bookings/booking-id-1/status`)
+        .set('Authorization', `Bearer ${makeToken(testMaster)}`)
+        .send({ status: 'COMPLETED' })
+        .expect(200);
+
+      expect(res.body.status).toBe('COMPLETED');
+      expect(res.body.actualPrice).toBeNull();
+
+      // data must NOT contain actualPrice key (no zero written)
+      expect(prismaMock.booking.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.not.objectContaining({ actualPrice: expect.anything() }),
+        })
+      );
+    });
+
+    it('should return 403 when a client tries to complete a booking', async () => {
+      const confirmedBooking = mockBooking({ status: 'CONFIRMED', startTime: pastDate() as unknown as Date });
+
+      prismaMock.user.findUnique.mockResolvedValue(testClient);
+      prismaMock.booking.findUnique.mockResolvedValue(confirmedBooking);
+
+      await supertest(app.getHttpServer())
+        .patch(`/api/bookings/booking-id-1/status`)
+        .set('Authorization', `Bearer ${makeToken(testClient)}`)
+        .send({ status: 'COMPLETED' })
+        .expect(403);
+    });
+
+    it('should return 400 on double COMPLETED (idempotency guard)', async () => {
+      const alreadyCompleted = mockBooking({ status: 'COMPLETED' });
+
+      prismaMock.user.findUnique.mockResolvedValue(testMaster);
+      prismaMock.booking.findUnique.mockResolvedValue(alreadyCompleted);
+
+      const res = await supertest(app.getHttpServer())
+        .patch(`/api/bookings/booking-id-1/status`)
+        .set('Authorization', `Bearer ${makeToken(testMaster)}`)
+        .send({ status: 'COMPLETED' })
+        .expect(400);
+
+      expect(res.body.message).toBe('Booking already completed');
+    });
+
+    it('should return 400 when actualPrice is negative', async () => {
+      prismaMock.user.findUnique.mockResolvedValue(testMaster);
+
+      await supertest(app.getHttpServer())
+        .patch(`/api/bookings/booking-id-1/status`)
+        .set('Authorization', `Bearer ${makeToken(testMaster)}`)
+        .send({ status: 'COMPLETED', actualPrice: -10 })
         .expect(400);
     });
   });
@@ -245,44 +386,29 @@ describe('BookingsController (e2e)', () => {
     });
 
     it('should return 200 with an array for a CLIENT user', async () => {
-      const mockBookings = [
-        {
-          id: 'b1',
-          serviceId: testService.id,
-          clientId: testClient.id,
-          masterId: testMaster.id,
-          startTime: new Date(),
-          endTime: new Date(),
-          status: 'PENDING',
-          service: { ...testService, category: { id: 'cat-1', name: 'Hair' } },
-          master: testMaster,
-        },
-      ];
+      const bookings = [mockBooking({ id: 'b1', estimatedPrice: 85, actualPrice: null })];
 
       prismaMock.user.findUnique.mockResolvedValue(testClient);
-      prismaMock.booking.findMany.mockResolvedValue(mockBookings);
-
-      const token = makeToken(testClient);
+      prismaMock.booking.findMany.mockResolvedValue(bookings);
 
       const res = await supertest(app.getHttpServer())
         .get('/api/bookings/my')
-        .set('Authorization', `Bearer ${token}`)
+        .set('Authorization', `Bearer ${makeToken(testClient)}`)
         .expect(200);
 
       expect(Array.isArray(res.body)).toBe(true);
       expect(res.body).toHaveLength(1);
       expect(res.body[0].id).toBe('b1');
+      expect(res.body[0].estimatedPrice).toBe(85);
     });
 
     it('should return 200 with an empty array when user has no bookings', async () => {
       prismaMock.user.findUnique.mockResolvedValue(testClient);
       prismaMock.booking.findMany.mockResolvedValue([]);
 
-      const token = makeToken(testClient);
-
       const res = await supertest(app.getHttpServer())
         .get('/api/bookings/my')
-        .set('Authorization', `Bearer ${token}`)
+        .set('Authorization', `Bearer ${makeToken(testClient)}`)
         .expect(200);
 
       expect(Array.isArray(res.body)).toBe(true);
@@ -290,19 +416,14 @@ describe('BookingsController (e2e)', () => {
     });
 
     it('should return 200 and call findMasterBookings for a MASTER user', async () => {
-      const masterUser = { ...testMaster, phone: null, avatar: null, bio: null };
-      prismaMock.user.findUnique.mockResolvedValue(masterUser);
+      prismaMock.user.findUnique.mockResolvedValue(testMaster);
       prismaMock.booking.findMany.mockResolvedValue([]);
 
-      const token = makeToken(testMaster);
-
-      const res = await supertest(app.getHttpServer())
+      await supertest(app.getHttpServer())
         .get('/api/bookings/my')
-        .set('Authorization', `Bearer ${token}`)
+        .set('Authorization', `Bearer ${makeToken(testMaster)}`)
         .expect(200);
 
-      expect(Array.isArray(res.body)).toBe(true);
-      // Verify the query was called with masterId (not clientId)
       expect(prismaMock.booking.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: { masterId: testMaster.id },

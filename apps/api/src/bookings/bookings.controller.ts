@@ -49,7 +49,8 @@ export class BookingsController {
     return this.bookingsService.updateStatus(
       id,
       req.user.id,
-      dto.status as BookingStatus
+      dto.status as BookingStatus,
+      dto.actualPrice
     );
   }
 }

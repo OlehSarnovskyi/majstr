@@ -1,6 +1,6 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { DatePipe } from '@angular/common';
+import { DatePipe, DecimalPipe } from '@angular/common';
 import {
   ApiService,
   Booking,
@@ -23,7 +23,7 @@ const STATUS_SK: Record<string, string> = {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [RouterLink, DatePipe, FormsModule],
+  imports: [RouterLink, DatePipe, DecimalPipe, FormsModule],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
 })
@@ -50,6 +50,12 @@ export class DashboardComponent implements OnInit {
   otherBookings = computed(() =>
     this.bookings().filter((b) => b.status !== 'PENDING')
   );
+
+  // Complete-booking modal
+  showCompleteModal = signal(false);
+  completingBookingId = signal<string | null>(null);
+  actualPriceInput = signal<number | null>(null);
+  completing = signal(false);
 
   private api = inject(ApiService);
   auth = inject(AuthService);
@@ -110,12 +116,46 @@ export class DashboardComponent implements OnInit {
         this.loadBookings();
         const msg =
           status === 'CONFIRMED' ? 'Rezervácia potvrdená' :
-          status === 'COMPLETED' ? 'Rezervácia dokončená' :
           'Rezervácia zrušená';
         this.toast.success(msg);
       },
       error: () => {
-        this.loadBookings(); // reload to show actual state
+        this.loadBookings();
+      },
+    });
+  }
+
+  openCompleteModal(bookingId: string) {
+    this.completingBookingId.set(bookingId);
+    this.actualPriceInput.set(null);
+    this.showCompleteModal.set(true);
+  }
+
+  closeCompleteModal() {
+    this.showCompleteModal.set(false);
+    this.completingBookingId.set(null);
+    this.actualPriceInput.set(null);
+  }
+
+  confirmComplete() {
+    const id = this.completingBookingId();
+    if (!id) return;
+
+    const price = this.actualPriceInput();
+    // Send actualPrice only if positive — treat 0 or empty as "not provided"
+    const actualPrice = price != null && price > 0 ? price : null;
+
+    this.completing.set(true);
+    this.api.updateBookingStatus(id, 'COMPLETED', actualPrice).subscribe({
+      next: () => {
+        this.completing.set(false);
+        this.closeCompleteModal();
+        this.loadBookings();
+        this.toast.success('Rezervácia dokončená');
+      },
+      error: () => {
+        this.completing.set(false);
+        this.loadBookings();
       },
     });
   }
