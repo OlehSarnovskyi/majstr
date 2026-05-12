@@ -39,6 +39,9 @@
         <button class="tab" [class.tab--active]="activeTab() === 'services'" (click)="activeTab.set('services')">
           Moje služby
         </button>
+        <button class="tab" [class.tab--active]="activeTab() === 'profile'" (click)="activeTab.set('profile')">
+          Môj profil
+        </button>
       </div>
     }
   </div>
@@ -322,5 +325,71 @@
         }
       </div>
     }
+  }
+
+  @if (activeTab() === 'profile' && auth.isMaster()) {
+    <div class="profile-section mt-2">
+
+      @if (loadingProfile()) {
+        <div class="skeleton" style="height: 140px; border-radius: var(--radius-lg)"></div>
+
+      } @else if (myProfile(); as p) {
+        <div class="card">
+          <div class="card__body">
+            <h2 class="profile-section__title">Váš verejný profil</h2>
+
+            <!-- Profile URL row -->
+            <div class="profile-url-row">
+              <span class="profile-url-row__label">
+                <span class="material-icons-outlined">link</span>
+                URL adresa
+              </span>
+              <div class="profile-url-row__value">
+                <a [href]="'/masters/' + p.slug" class="profile-url-row__link" target="_blank">
+                  majster.sk/masters/{{ p.slug }}
+                </a>
+                <button
+                  class="btn btn--ghost btn--sm profile-url-row__copy"
+                  (click)="copyProfileUrl()"
+                  [attr.aria-label]="profileUrlCopied() ? 'Skopírované' : 'Kopírovať odkaz'"
+                >
+                  <span class="material-icons-outlined">{{ profileUrlCopied() ? 'check' : 'content_copy' }}</span>
+                  {{ profileUrlCopied() ? 'Skopírované' : 'Kopírovať' }}
+                </button>
+              </div>
+            </div>
+
+            <!-- Description -->
+            @if (p.description) {
+              <p class="profile-section__desc">{{ p.description }}</p>
+            } @else {
+              <p class="text-muted profile-section__desc">Popis nie je nastavený.</p>
+            }
+
+            <!-- Verification badge -->
+            @if (p.isVerified) {
+              <span class="badge badge--confirmed">
+                <span class="material-icons-outlined">verified</span> Overený majster
+              </span>
+            }
+
+            <div class="profile-section__actions mt-2">
+              <a [routerLink]="['/masters', p.slug]" class="btn btn--ghost btn--sm" target="_blank">
+                <span class="material-icons-outlined">open_in_new</span>
+                Zobraziť profil
+              </a>
+            </div>
+          </div>
+        </div>
+
+      } @else {
+        <div class="empty">
+          <span class="material-icons-outlined">badge</span>
+          <h3>Profil ešte nebol vytvorený</h3>
+          <a routerLink="/auth/create-profile" class="btn btn--primary mt-2">Vytvoriť profil</a>
+        </div>
+      }
+
+    </div>
   }
 </div>

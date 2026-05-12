@@ -1,0 +1,80 @@
+@import '../auth-shared';
+
+// ── Slug input with inline prefix ────────────────────────────────────────────
+
+.slug-input-wrap {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--color-surface);
+  transition: border-color 0.15s;
+
+  &:focus-within {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgb(from var(--color-primary) r g b / 0.12);
+  }
+
+  &__prefix {
+    padding: 0 0.75rem;
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+    border-right: 1px solid var(--color-border);
+    background: var(--color-bg);
+    user-select: none;
+  }
+
+  &__input {
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+// ── Hints ─────────────────────────────────────────────────────────────────────
+
+.form-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.8rem;
+  margin-top: 0.35rem;
+
+  .material-icons-outlined { font-size: 1rem; }
+
+  &--ok      { color: var(--color-success, #16a34a); }
+  &--error   { color: var(--color-danger,  #dc2626); }
+  &--checking { color: var(--color-text-muted); }
+}
+
+// ── Preview URL ───────────────────────────────────────────────────────────────
+
+.slug-preview {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+
+  .material-icons-outlined { font-size: 1rem; }
+
+  &__url {
+    font-family: monospace;
+    word-break: break-all;
+  }
+}
+
+// ── Spinner on button ─────────────────────────────────────────────────────────
+
+.btn__spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

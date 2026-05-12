@@ -12,49 +12,49 @@
       </div>
     </div>
 
-  } @else if (master(); as m) {
+  } @else if (profile(); as p) {
 
     <!-- ── Hero card ───────────────────────────────────────────────── -->
     <div class="hero card">
       <div class="card__body hero__body">
 
         <div class="hero__avatar">
-          @if (m.avatar) {
-            <img [src]="m.avatar" [alt]="m.firstName" />
+          @if (p.user.avatar) {
+            <img [src]="p.user.avatar" [alt]="p.user.firstName" />
           } @else {
-            <span class="hero__initials">{{ getInitials(m) }}</span>
+            <span class="hero__initials">{{ getInitials(p) }}</span>
           }
         </div>
 
         <div class="hero__info">
-          <h1 class="hero__name">{{ m.firstName }} {{ m.lastName }}</h1>
+          <h1 class="hero__name">{{ p.user.firstName }} {{ p.user.lastName }}</h1>
 
           <!-- Meta chips -->
           <div class="hero__chips">
-            @if (m.city) {
+            @if (p.user.city) {
               <span class="chip">
-                <span class="material-icons-outlined">location_on</span>{{ m.city }}
+                <span class="material-icons-outlined">location_on</span>{{ p.user.city }}
               </span>
             }
             <span class="chip">
-              <span class="material-icons-outlined">build</span>{{ m.services?.length || 0 }} služieb
+              <span class="material-icons-outlined">build</span>{{ p.user.services?.length || 0 }} služieb
             </span>
-            @if (getWorkingDays(m)) {
+            @if (getWorkingDays(p)) {
               <span class="chip">
-                <span class="material-icons-outlined">calendar_today</span>{{ getWorkingDays(m) }}
+                <span class="material-icons-outlined">calendar_today</span>{{ getWorkingDays(p) }}
               </span>
             }
-            @if (getMemberSince(m)) {
+            @if (getMemberSince(p)) {
               <span class="chip chip--verified">
-                <span class="material-icons-outlined">verified</span>od {{ getMemberSince(m) }}
+                <span class="material-icons-outlined">verified</span>od {{ getMemberSince(p) }}
               </span>
             }
           </div>
 
           <!-- Bio -->
-          @if (m.bio) {
-            <p class="hero__bio">{{ bioText(m) }}</p>
-            @if (m.bio.length > bioLimit) {
+          @if (p.user.bio) {
+            <p class="hero__bio">{{ bioText(p) }}</p>
+            @if (p.user.bio.length > bioLimit) {
               <button class="btn-link" (click)="toggleBio()">
                 <span>{{ bioExpanded() ? 'Zobraziť menej' : 'Zobraziť viac' }}</span>
                 <span class="material-icons-outlined">{{ bioExpanded() ? 'expand_less' : 'expand_more' }}</span>
@@ -70,14 +70,14 @@
     <section class="services-section">
       <h2 class="services-section__title">Služby</h2>
 
-      @if (!m.services || m.services.length === 0) {
+      @if (!p.user.services || p.user.services.length === 0) {
         <div class="empty-services">
           <span class="material-icons-outlined">home_repair_service</span>
           <p class="text-muted">Zatiaľ žiadne služby.</p>
         </div>
       } @else {
         <div class="services-grid">
-          @for (svc of m.services; track svc.id) {
+          @for (svc of p.user.services; track svc.id) {
             <div class="svc-card card card--hover">
               <div class="card__body">
                 <div class="svc-card__top">

@@ -1,0 +1,93 @@
+<div class="auth-page">
+  <div class="auth-card card">
+    <div class="card__body">
+
+      <div class="auth-card__header">
+        <span class="material-icons-outlined auth-card__icon">badge</span>
+        <h1 class="auth-card__title">Vytvorte si profil majstra</h1>
+        <p class="auth-card__subtitle text-muted">
+          Zvoľte si jedinečnú URL adresu, pod ktorou vás klienti nájdu.
+        </p>
+      </div>
+
+      <!-- Slug field -->
+      <div class="form-group">
+        <label class="form-label" for="slug">URL adresa profilu</label>
+
+        <div class="slug-input-wrap">
+          <span class="slug-input-wrap__prefix">majster.sk/masters/</span>
+          <input
+            id="slug"
+            class="form-control slug-input-wrap__input"
+            type="text"
+            [class.is-invalid]="!!slugError()"
+            [class.is-valid]="slugAvailable() === true && !slugError()"
+            [ngModel]="slug()"
+            (ngModelChange)="onSlugChange($event)"
+            placeholder="jan-novak"
+            maxlength="60"
+            autocomplete="off"
+          />
+        </div>
+
+        <!-- Validation / availability feedback -->
+        @if (slugError()) {
+          <p class="form-hint form-hint--error">{{ slugError() }}</p>
+        } @else if (slugChecking()) {
+          <p class="form-hint form-hint--checking">
+            <span class="material-icons-outlined">hourglass_top</span> Kontrolujem dostupnosť…
+          </p>
+        } @else if (slugAvailable() === true) {
+          <p class="form-hint form-hint--ok">
+            <span class="material-icons-outlined">check_circle</span> Dostupné!
+          </p>
+        } @else if (slugAvailable() === false) {
+          <p class="form-hint form-hint--error">
+            <span class="material-icons-outlined">cancel</span> Táto adresa je už obsadená
+          </p>
+        }
+
+        <!-- Live preview -->
+        <p class="slug-preview">
+          <span class="material-icons-outlined">link</span>
+          <span class="slug-preview__url">{{ previewUrl() }}</span>
+        </p>
+      </div>
+
+      <!-- Description field -->
+      <div class="form-group">
+        <label class="form-label" for="description">O sebe <span class="text-muted">(nepovinné)</span></label>
+        <textarea
+          id="description"
+          class="form-control"
+          rows="3"
+          maxlength="500"
+          placeholder="Krátky popis vašich skúseností a služieb…"
+          [ngModel]="description()"
+          (ngModelChange)="description.set($event)"
+        ></textarea>
+        <p class="form-hint text-muted">{{ description().length }}/500</p>
+      </div>
+
+      <!-- Error -->
+      @if (error()) {
+        <p class="form-error">{{ error() }}</p>
+      }
+
+      <!-- Submit -->
+      <button
+        class="btn btn--primary btn--full"
+        [disabled]="!canSubmit()"
+        (click)="submit()"
+      >
+        @if (submitting()) {
+          <span class="material-icons-outlined btn__spinner">autorenew</span>
+          Vytváram profil…
+        } @else {
+          Vytvoriť profil
+        }
+      </button>
+
+    </div>
+  </div>
+</div>

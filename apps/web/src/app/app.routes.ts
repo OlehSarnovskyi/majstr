@@ -1,6 +1,7 @@
 import { Route } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 import { guestGuard } from './core/guards/guest.guard';
+import { masterProfileGuard, noProfileGuard } from './core/guards/master-profile.guard';
 
 export const appRoutes: Route[] = [
   {
@@ -31,6 +32,14 @@ export const appRoutes: Route[] = [
     loadComponent: () =>
       import('./pages/auth/choose-role/choose-role.component').then(
         (m) => m.ChooseRoleComponent
+      ),
+  },
+  {
+    path: 'auth/create-profile',
+    canActivate: [noProfileGuard],
+    loadComponent: () =>
+      import('./pages/auth/create-profile/create-profile.component').then(
+        (m) => m.CreateProfileComponent
       ),
   },
   {
@@ -101,7 +110,7 @@ export const appRoutes: Route[] = [
   },
   {
     path: 'dashboard',
-    canActivate: [authGuard],
+    canActivate: [authGuard, masterProfileGuard],
     loadComponent: () =>
       import('./pages/dashboard/dashboard.component').then(
         (m) => m.DashboardComponent

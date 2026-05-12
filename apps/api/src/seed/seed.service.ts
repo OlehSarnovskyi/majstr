@@ -1,5 +1,6 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { generateSlug } from '../masters/utils/slug.util';
 
 const CATEGORIES = [
   { name: 'Inštalatérstvo',          slug: 'instalaterstvo',          icon: 'plumbing' },
@@ -26,6 +27,47 @@ export class SeedService implements OnModuleInit {
 
   async onModuleInit() {
     await this.seedCategories();
+    await this.seedMasterProfiles();
+  }
+
+  /**
+   * Backfill MasterProfile for any MASTER user who doesn't have one yet.
+   * Runs on every startup — idempotent (skips masters who already have a profile).
+   */
+  private async seedMasterProfiles() {
+    try {
+      const mastersWithoutProfile = await this.prisma.user.findMany({
+        where: { role: 'MASTER', masterProfile: null },
+        select: { id: true, firstName: true, lastName: true },
+      });
+
+      if (mastersWithoutProfile.length === 0) {
+        this.logger.log('All masters already have profiles — skipping seed');
+        return;
+      }
+
+      // Load all existing slugs up-front to avoid collisions within this batch
+      const existing = await this.prisma.masterProfile.findMany({
+        select: { slug: true },
+      });
+      const existingSlugs = existing.map((p) => p.slug);
+
+      for (const master of mastersWithoutProfile) {
+        const slug = generateSlug(master.firstName, master.lastName, existingSlugs);
+        existingSlugs.push(slug); // reserve for next iteration
+
+        await this.prisma.masterProfile.create({
+          data: { userId: master.id, slug },
+        });
+        this.logger.log(`Created MasterProfile for user ${master.id}: slug="${slug}"`);
+      }
+
+      this.logger.log(
+        `Seeded MasterProfile for ${mastersWithoutProfile.length} master(s)`,
+      );
+    } catch (err) {
+      this.logger.error('Failed to seed master profiles', err);
+    }
   }
 
   private async seedCategories() {

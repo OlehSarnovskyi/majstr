@@ -5,6 +5,7 @@ import {
   ApiService,
   Booking,
   Category,
+  MasterProfile,
   Service,
 } from '../../core/services/api.service';
 import { AuthService } from '../../core/services/auth.service';
@@ -30,7 +31,7 @@ const STATUS_SK: Record<string, string> = {
 export class DashboardComponent implements OnInit {
   bookings = signal<Booking[]>([]);
   loading = signal(true);
-  activeTab = signal<'bookings' | 'services'>('bookings');
+  activeTab = signal<'bookings' | 'services' | 'profile'>('bookings');
 
   // Master: manage services
   myServices = signal<Service[]>([]);
@@ -51,6 +52,11 @@ export class DashboardComponent implements OnInit {
     this.bookings().filter((b) => b.status !== 'PENDING')
   );
 
+  // Master profile
+  myProfile = signal<MasterProfile | null>(null);
+  loadingProfile = signal(false);
+  profileUrlCopied = signal(false);
+
   // Complete-booking modal
   showCompleteModal = signal(false);
   completingBookingId = signal<string | null>(null);
@@ -69,7 +75,29 @@ export class DashboardComponent implements OnInit {
     if (this.auth.isMaster()) {
       this.api.getCategories().subscribe((cats) => this.categories.set(cats));
       this.loadServices();
+      this.loadProfile();
     }
+  }
+
+  loadProfile() {
+    this.loadingProfile.set(true);
+    this.api.getMyMasterProfile().subscribe({
+      next: (p) => {
+        this.myProfile.set(p);
+        this.loadingProfile.set(false);
+      },
+      error: () => this.loadingProfile.set(false),
+    });
+  }
+
+  copyProfileUrl() {
+    const slug = this.myProfile()?.slug;
+    if (!slug) return;
+    const url = `${window.location.origin}/masters/${slug}`;
+    navigator.clipboard.writeText(url).then(() => {
+      this.profileUrlCopied.set(true);
+      setTimeout(() => this.profileUrlCopied.set(false), 2000);
+    });
   }
 
   loadBookings() {

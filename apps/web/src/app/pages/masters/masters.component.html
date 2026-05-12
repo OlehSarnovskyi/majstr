@@ -24,7 +24,7 @@
   } @else {
     <div class="grid">
       @for (m of masters(); track m.id) {
-        <a [routerLink]="['/masters', m.id]" class="master-card card card--hover">
+        <a [routerLink]="['/masters', m.masterProfile?.slug ?? m.id]" class="master-card card card--hover">
           <div class="card__body">
             <div class="master-card__avatar">
               @if (m.avatar) {

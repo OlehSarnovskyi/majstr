@@ -31,8 +31,23 @@ model User {
   bookingsAsClient Booking[] @relation("ClientBookings")
   bookingsAsMaster Booking[] @relation("MasterBookings")
   services         Service[]
+  masterProfile    MasterProfile?
 
   @@map("users")
+}
+
+model MasterProfile {
+  id          String   @id @default(uuid())
+  userId      String   @unique @map("user_id")
+  slug        String   @unique
+  description String?
+  isVerified  Boolean  @default(false) @map("is_verified")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("master_profiles")
 }
 
 model ServiceCategory {

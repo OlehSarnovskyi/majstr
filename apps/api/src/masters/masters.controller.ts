@@ -1,11 +1,28 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { SkipThrottle } from '@nestjs/throttler';
 import { MastersService } from './masters.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RolesGuard, Roles } from '../auth/roles.guard';
+import { Role } from '@prisma/client';
+import { CreateMasterProfileDto } from './dto/create-master-profile.dto';
+import { UpdateMasterProfileDto } from './dto/update-master-profile.dto';
 
 @SkipThrottle()
 @Controller('masters')
 export class MastersController {
   constructor(private readonly mastersService: MastersService) {}
+
+  // ── Public listing ───────────────────────────────────────────────────────
 
   @Get()
   findAll(@Query('city') city?: string, @Query('search') search?: string) {
@@ -17,8 +34,53 @@ export class MastersController {
     return this.mastersService.findAll_cities();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.mastersService.findOne(id);
+  // ── Authenticated profile endpoints ──────────────────────────────────────
+  // IMPORTANT: these fixed-segment routes MUST appear before `:slug` so that
+  // NestJS does not swallow "profile" or "slug" as a dynamic parameter.
+
+  /** GET /masters/profile/me — returns the caller's own profile (null if none yet). */
+  @UseGuards(JwtAuthGuard)
+  @Get('profile/me')
+  getMyProfile(@Request() req: { user: { userId: string } }) {
+    return this.mastersService.getMyProfile(req.user.userId);
+  }
+
+  /** POST /masters/profile — create profile for the authenticated MASTER. */
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.MASTER)
+  @Post('profile')
+  createProfile(
+    @Request() req: { user: { userId: string } },
+    @Body() dto: CreateMasterProfileDto,
+  ) {
+    return this.mastersService.createProfile(req.user.userId, dto);
+  }
+
+  /** PATCH /masters/profile — update the authenticated MASTER's profile. */
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.MASTER)
+  @Patch('profile')
+  updateProfile(
+    @Request() req: { user: { userId: string } },
+    @Body() dto: UpdateMasterProfileDto,
+  ) {
+    return this.mastersService.updateProfile(req.user.userId, dto);
+  }
+
+  /** GET /masters/slug/check?slug=xxx — availability check (no auth required). */
+  @Get('slug/check')
+  checkSlug(
+    @Query('slug') slug: string,
+    @Query('userId') userId?: string,
+  ) {
+    return this.mastersService.checkSlugAvailability(slug, userId);
+  }
+
+  // ── Public master detail — slug or legacy UUID ───────────────────────────
+
+  /** GET /masters/:slug — resolves by slug first, falls back to user UUID. */
+  @Get(':slug')
+  findOne(@Param('slug') slug: string) {
+    return this.mastersService.findOne(slug);
   }
 }

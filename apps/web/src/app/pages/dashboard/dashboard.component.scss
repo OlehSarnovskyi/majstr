@@ -329,6 +329,56 @@ select.form-field__input {
   to   { transform: translate(-50%, -50%) scale(1);    opacity: 1; }
 }
 
+// ─── Profile section ─────────────────────────────────────────────────────────
+
+.profile-section {
+  &__title { font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; }
+  &__desc  { margin: 0.75rem 0; line-height: 1.5; }
+  &__actions { display: flex; gap: 8px; }
+}
+
+.profile-url-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  flex-wrap: wrap;
+
+  &__label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+    .material-icons-outlined { font-size: 1rem; }
+  }
+
+  &__value {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__link {
+    font-family: monospace;
+    font-size: 0.85rem;
+    color: var(--color-primary);
+    text-decoration: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    &:hover { text-decoration: underline; }
+  }
+
+  &__copy { white-space: nowrap; margin-left: auto; }
+}
+
 // ─── Responsive ───────────────────────────────────────────────────────────────
 
 @media (max-width: 640px) {

@@ -1,6 +1,6 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { ApiService, Master } from '../../core/services/api.service';
+import { ApiService, PublicMaster } from '../../core/services/api.service';
 import { AuthService } from '../../core/services/auth.service';
 import { SeoService } from '../../core/services/seo.service';
 
@@ -12,7 +12,7 @@ import { SeoService } from '../../core/services/seo.service';
   styleUrl: './masters.component.scss',
 })
 export class MastersComponent implements OnInit {
-  masters = signal<Master[]>([]);
+  masters = signal<PublicMaster[]>([]);
   loading = signal(true);
 
   auth = inject(AuthService);
@@ -30,7 +30,7 @@ export class MastersComponent implements OnInit {
     });
   }
 
-  getInitials(m: Master): string {
+  getInitials(m: PublicMaster): string {
     return (m.firstName[0] + m.lastName[0]).toUpperCase();
   }
 }

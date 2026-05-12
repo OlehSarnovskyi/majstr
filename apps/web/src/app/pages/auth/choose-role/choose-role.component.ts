@@ -131,7 +131,14 @@ export class ChooseRoleComponent {
         role === 'MASTER' ? this.workingHours : undefined
       )
       .subscribe({
-        next: () => this.router.navigate(['/dashboard']),
+        next: () => {
+          // MASTERs must create a profile before accessing the dashboard
+          if (role === 'MASTER') {
+            this.router.navigate(['/auth/create-profile']);
+          } else {
+            this.router.navigate(['/dashboard']);
+          }
+        },
         error: () => this.loading.set(false),
       });
   }

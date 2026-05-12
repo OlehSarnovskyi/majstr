@@ -39,6 +39,37 @@ export interface Master {
   services?: Service[];
 }
 
+/** Item shape returned by GET /masters (list). */
+export interface PublicMaster {
+  id: string;
+  firstName: string;
+  lastName: string;
+  avatar: string | null;
+  bio: string | null;
+  city: string | null;
+  masterProfile: { slug: string } | null;
+  _count: { services: number };
+}
+
+/** Full profile shape returned by GET /masters/:slug and GET /masters/profile/me. */
+export interface MasterProfile {
+  id: string;
+  slug: string;
+  description: string | null;
+  isVerified: boolean;
+  createdAt: string;
+  user: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    avatar: string | null;
+    bio: string | null;
+    city: string | null;
+    workingHours: WorkingHours | null;
+    services: Service[];
+  };
+}
+
 export interface Service {
   id: string;
   name: string;
@@ -123,12 +154,38 @@ export class ApiService {
   }
 
   // Masters
-  getMasters() {
-    return this.http.get<Master[]>('/api/masters');
+  getMasters(filters?: { city?: string; search?: string }) {
+    const params: Record<string, string> = {};
+    if (filters?.city)   params['city']   = filters.city;
+    if (filters?.search) params['search'] = filters.search;
+    return this.http.get<PublicMaster[]>('/api/masters', { params });
   }
 
-  getMaster(id: string) {
-    return this.http.get<Master>(`/api/masters/${id}`);
+  /** Resolves by slug first, falls back to UUID for legacy links. */
+  getMaster(slugOrId: string) {
+    return this.http.get<MasterProfile>(`/api/masters/${slugOrId}`);
+  }
+
+  // Master profile management (requires auth)
+  getMyMasterProfile() {
+    return this.http.get<MasterProfile | null>('/api/masters/profile/me');
+  }
+
+  createMasterProfile(dto: { slug: string; description?: string }) {
+    return this.http.post<MasterProfile>('/api/masters/profile', dto);
+  }
+
+  updateMasterProfile(dto: { slug?: string; description?: string }) {
+    return this.http.patch<MasterProfile>('/api/masters/profile', dto);
+  }
+
+  checkSlugAvailability(slug: string, userId?: string) {
+    const params: Record<string, string> = { slug };
+    if (userId) params['userId'] = userId;
+    return this.http.get<{ slug: string; available: boolean }>(
+      '/api/masters/slug/check',
+      { params }
+    );
   }
 
   // Bookings
