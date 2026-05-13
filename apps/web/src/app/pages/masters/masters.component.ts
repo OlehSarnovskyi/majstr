@@ -1,7 +1,7 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { ApiService, City, PublicMaster } from '../../core/services/api.service';
+import { ApiService, Category, City, PublicMaster } from '../../core/services/api.service';
 import { AuthService } from '../../core/services/auth.service';
 import { SeoService } from '../../core/services/seo.service';
 
@@ -13,10 +13,13 @@ import { SeoService } from '../../core/services/seo.service';
   styleUrl: './masters.component.scss',
 })
 export class MastersComponent implements OnInit {
-  masters = signal<PublicMaster[]>([]);
-  loading = signal(true);
-  cities = signal<City[]>([]);
-  selectedCity = '';   // city slug for API filter
+  masters  = signal<PublicMaster[]>([]);
+  loading  = signal(true);
+  cities   = signal<City[]>([]);
+  categories = signal<Category[]>([]);
+
+  selectedCity     = '';   // city slug
+  selectedCategory = '';   // category slug
 
   auth = inject(AuthService);
   private api = inject(ApiService);
@@ -25,21 +28,22 @@ export class MastersComponent implements OnInit {
   ngOnInit() {
     this.seo.setPage('Majstri', 'Prehliadajte overených remeselníkov a profesionálov na Majster.sk');
     this.api.getCities().subscribe((c) => this.cities.set(c));
+    this.api.getCategories().subscribe((c) => this.categories.set(c));
     this.loadMasters();
   }
 
   loadMasters() {
     this.loading.set(true);
-    this.api.getMasters(this.selectedCity ? { city: this.selectedCity } : undefined).subscribe({
-      next: (m) => {
-        this.masters.set(m);
-        this.loading.set(false);
-      },
-      error: () => this.loading.set(false),
+    const filters: { city?: string; category?: string } = {};
+    if (this.selectedCity)     filters.city     = this.selectedCity;
+    if (this.selectedCategory) filters.category = this.selectedCategory;
+    this.api.getMasters(Object.keys(filters).length ? filters : undefined).subscribe({
+      next:  (m) => { this.masters.set(m); this.loading.set(false); },
+      error: ()  => this.loading.set(false),
     });
   }
 
-  onCityChange() {
+  onFilterChange() {
     this.loadMasters();
   }
 

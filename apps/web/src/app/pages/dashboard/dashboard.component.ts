@@ -7,6 +7,7 @@ import {
   Category,
   MasterProfile,
   Service,
+  ServiceCategory,
 } from '../../core/services/api.service';
 import { AuthService } from '../../core/services/auth.service';
 import { SeoService } from '../../core/services/seo.service';
@@ -59,6 +60,12 @@ export class DashboardComponent implements OnInit {
   profileUrlCopied = signal(false);
   savingTimezone = signal(false);
 
+  // Category management in profile tab
+  allCategories = signal<ServiceCategory[]>([]);
+  editingCategories = signal(false);
+  pendingCategoryIds = signal<Set<string>>(new Set());
+  savingCategories = signal(false);
+
   readonly timezones: { value: string; label: string }[] = [
     { value: 'Europe/Bratislava', label: 'Bratislava — CET/CEST (UTC+1/+2)' },
     { value: 'Europe/Prague',     label: 'Praha — CET/CEST (UTC+1/+2)' },
@@ -103,7 +110,10 @@ export class DashboardComponent implements OnInit {
     this.seo.setPage('Nástenka');
     this.loadBookings();
     if (this.auth.isMaster()) {
-      this.api.getCategories().subscribe((cats) => this.categories.set(cats));
+      this.api.getCategories().subscribe((cats) => {
+        this.categories.set(cats);
+        this.allCategories.set(cats);
+      });
       this.loadServices();
       this.loadProfile();
     }
@@ -362,6 +372,54 @@ export class DashboardComponent implements OnInit {
         },
       });
     }
+  }
+
+  // ── Category edit helpers ──────────────────────────────────────────────────
+
+  openCategoryEdit() {
+    const current = this.myProfile()?.user.masterCategories ?? [];
+    this.pendingCategoryIds.set(new Set(current.map((mc) => mc.category.id)));
+    this.editingCategories.set(true);
+  }
+
+  cancelCategoryEdit() {
+    this.editingCategories.set(false);
+  }
+
+  isPendingCategorySelected(id: string): boolean {
+    return this.pendingCategoryIds().has(id);
+  }
+
+  togglePendingCategory(id: string) {
+    const current = new Set(this.pendingCategoryIds());
+    if (current.has(id)) {
+      current.delete(id);
+    } else {
+      if (current.size >= 3) return;
+      current.add(id);
+    }
+    this.pendingCategoryIds.set(current);
+  }
+
+  saveCategories() {
+    const ids = [...this.pendingCategoryIds()];
+    if (ids.length < 1) {
+      this.toast.error('Vyberte aspoň 1 kategóriu');
+      return;
+    }
+    this.savingCategories.set(true);
+    this.api.setMasterCategories(ids).subscribe({
+      next: (p) => {
+        this.myProfile.set(p);
+        this.savingCategories.set(false);
+        this.editingCategories.set(false);
+        this.toast.success('Kategórie uložené');
+      },
+      error: () => {
+        this.savingCategories.set(false);
+        this.toast.error('Nepodarilo sa uložiť kategórie');
+      },
+    });
   }
 
   // ── Review helpers ─────────────────────────────────────────────────────────

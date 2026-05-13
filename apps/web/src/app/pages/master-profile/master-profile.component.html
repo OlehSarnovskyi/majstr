@@ -39,6 +39,11 @@
             <span class="chip">
               <span class="material-icons-outlined">build</span>{{ p.user.services?.length || 0 }} služieb
             </span>
+            @for (mc of p.user.masterCategories; track mc.category.id) {
+              <span class="chip chip--category">
+                <span class="material-icons-outlined">{{ mc.category.icon }}</span>{{ mc.category.name }}
+              </span>
+            }
             @if (getWorkingDays(p)) {
               <span class="chip">
                 <span class="material-icons-outlined">calendar_today</span>{{ getWorkingDays(p) }}

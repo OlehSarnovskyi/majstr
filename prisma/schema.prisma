@@ -42,10 +42,11 @@ model User {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  bookingsAsClient Booking[] @relation("ClientBookings")
-  bookingsAsMaster Booking[] @relation("MasterBookings")
-  services         Service[]
-  masterProfile    MasterProfile?
+  bookingsAsClient  Booking[]       @relation("ClientBookings")
+  bookingsAsMaster  Booking[]       @relation("MasterBookings")
+  services          Service[]
+  masterProfile     MasterProfile?
+  masterCategories  MasterCategory[] @relation("MasterCategories")
 
   @@map("users")
 }
@@ -69,9 +70,21 @@ model ServiceCategory {
   name     String    @unique
   slug     String    @unique
   icon     String?
-  services Service[]
+  services          Service[]
+  masterCategories  MasterCategory[]
 
   @@map("service_categories")
+}
+
+model MasterCategory {
+  masterId   String @map("master_id")
+  categoryId String @map("category_id")
+
+  master   User            @relation("MasterCategories", fields: [masterId], references: [id], onDelete: Cascade)
+  category ServiceCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([masterId, categoryId])
+  @@map("master_categories")
 }
 
 model Service {

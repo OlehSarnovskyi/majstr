@@ -401,6 +401,76 @@ select.form-field__input {
   margin-top: 4px;
 }
 
+// ─── Category section in profile tab ─────────────────────────────────────────
+
+.cat-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.cat-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-height: 28px;
+}
+
+.cat-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px 4px 6px;
+  background: rgb(from var(--color-primary) r g b / 0.08);
+  color: var(--color-primary);
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+
+  .material-icons-outlined { font-size: 15px; }
+}
+
+.cat-edit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.cat-edit-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, opacity 0.15s;
+
+  .material-icons-outlined { font-size: 16px; color: var(--color-text-muted); }
+
+  &:hover:not(&--disabled):not(&--selected) { border-color: var(--color-primary-light, #6ea8fe); }
+
+  &--selected {
+    border-color: var(--color-primary);
+    background: rgb(from var(--color-primary) r g b / 0.06);
+    color: var(--color-primary);
+    .material-icons-outlined { color: var(--color-primary); }
+  }
+
+  &--disabled { opacity: 0.4; cursor: not-allowed; }
+}
+
+.cat-edit-actions {
+  display: flex;
+  gap: 8px;
+}
+
 // ─── Review form (client, on completed booking cards) ────────────────────────
 
 .review-cta {

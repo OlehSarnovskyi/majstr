@@ -16,6 +16,7 @@ import { RolesGuard, Roles } from '../auth/roles.guard';
 import { Role } from '@prisma/client';
 import { CreateMasterProfileDto } from './dto/create-master-profile.dto';
 import { UpdateMasterProfileDto } from './dto/update-master-profile.dto';
+import { SetMasterCategoriesDto } from './dto/set-master-categories.dto';
 
 @SkipThrottle()
 @Controller('masters')
@@ -25,8 +26,12 @@ export class MastersController {
   // ── Public listing ───────────────────────────────────────────────────────
 
   @Get()
-  findAll(@Query('city') city?: string, @Query('search') search?: string) {
-    return this.mastersService.findAll({ city, search });
+  findAll(
+    @Query('city')     city?: string,
+    @Query('category') category?: string,
+    @Query('search')   search?: string,
+  ) {
+    return this.mastersService.findAll({ city, category, search });
   }
 
   @Get('cities')
@@ -54,6 +59,17 @@ export class MastersController {
     @Body() dto: CreateMasterProfileDto,
   ) {
     return this.mastersService.createProfile(req.user.id, dto);
+  }
+
+  /** POST /masters/profile/categories — set (replace) master's specialization categories. */
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.MASTER)
+  @Post('profile/categories')
+  setCategories(
+    @Request() req: { user: { id: string } },
+    @Body() dto: SetMasterCategoriesDto,
+  ) {
+    return this.mastersService.setCategories(req.user.id, dto);
   }
 
   /** PATCH /masters/profile — update the authenticated MASTER's profile. */

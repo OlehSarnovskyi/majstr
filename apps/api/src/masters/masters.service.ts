@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -7,11 +8,15 @@ import { PrismaService } from '../prisma/prisma.service';
 import { Role, Prisma } from '@prisma/client';
 import { CreateMasterProfileDto } from './dto/create-master-profile.dto';
 import { UpdateMasterProfileDto } from './dto/update-master-profile.dto';
+import { SetMasterCategoriesDto } from './dto/set-master-categories.dto';
 import { ReviewsService } from '../reviews/reviews.service';
 
 /** UUID v4 pattern — used to detect legacy UUID-based lookups */
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+/** Category shape reused across selects */
+const CATEGORY_SELECT = { select: { id: true, name: true, slug: true, icon: true } } as const;
 
 /** Fields included in every public master-profile response */
 const PROFILE_SELECT = {
@@ -34,6 +39,10 @@ const PROFILE_SELECT = {
         include: { category: true },
         orderBy: { createdAt: 'desc' as const },
       },
+      masterCategories: {
+        include: { category: CATEGORY_SELECT },
+        orderBy: { category: { name: 'asc' as const } },
+      },
     },
   },
 } satisfies Prisma.MasterProfileSelect;
@@ -47,11 +56,8 @@ export class MastersService {
 
   // ── Public master listing ────────────────────────────────────────────────
 
-  async findAll(filters?: { city?: string; search?: string }) {
-    const where: Prisma.UserWhereInput = {
-      role: Role.MASTER,
-      services: { some: {} },
-    };
+  async findAll(filters?: { city?: string; category?: string; search?: string }) {
+    const where: Prisma.UserWhereInput = { role: Role.MASTER };
 
     if (filters?.city) {
       const citySlug = filters.city.toLowerCase();
@@ -60,11 +66,18 @@ export class MastersService {
       where.cityId = city.id;
     }
 
+    if (filters?.category) {
+      const categorySlug = filters.category.toLowerCase();
+      const cat = await this.prisma.serviceCategory.findUnique({ where: { slug: categorySlug } });
+      if (!cat) throw new NotFoundException(`Category '${categorySlug}' not found`);
+      where.masterCategories = { some: { categoryId: cat.id } };
+    }
+
     if (filters?.search) {
       where.OR = [
         { firstName: { contains: filters.search, mode: 'insensitive' } },
         { lastName:  { contains: filters.search, mode: 'insensitive' } },
-        { services: { some: { name: { contains: filters.search, mode: 'insensitive' } } } },
+        { services:  { some: { name: { contains: filters.search, mode: 'insensitive' } } } },
       ];
     }
 
@@ -78,6 +91,10 @@ export class MastersService {
         bio: true,
         city: { select: { id: true, name: true, slug: true } },
         masterProfile: { select: { slug: true } },
+        masterCategories: {
+          include: { category: CATEGORY_SELECT },
+          orderBy: { category: { name: 'asc' as const } },
+        },
         _count: { select: { services: true } },
       },
       orderBy: { createdAt: 'desc' },
@@ -191,6 +208,36 @@ export class MastersService {
         // timezone lives on the User record — update via nested write
         ...(dto.timezone    !== undefined && { user: { update: { timezone: dto.timezone } } }),
       },
+      select: PROFILE_SELECT,
+    });
+  }
+
+  /**
+   * Set (replace) master specialization categories.
+   * Validates 1-3 categories, verifies all UUIDs exist, then does a full replace
+   * (deleteMany + createMany) in a transaction — idempotent.
+   */
+  async setCategories(masterId: string, dto: SetMasterCategoriesDto) {
+    // Validate all categoryIds exist
+    const found = await this.prisma.serviceCategory.findMany({
+      where: { id: { in: dto.categoryIds } },
+      select: { id: true },
+    });
+    if (found.length !== dto.categoryIds.length) {
+      throw new BadRequestException('Niektoré kategórie neexistujú');
+    }
+
+    // Full replace in a transaction
+    await this.prisma.$transaction([
+      this.prisma.masterCategory.deleteMany({ where: { masterId } }),
+      this.prisma.masterCategory.createMany({
+        data: dto.categoryIds.map((categoryId) => ({ masterId, categoryId })),
+      }),
+    ]);
+
+    // Return updated profile
+    return this.prisma.masterProfile.findUnique({
+      where: { userId: masterId },
       select: PROFILE_SELECT,
     });
   }

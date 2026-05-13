@@ -8,11 +8,15 @@ export interface City {
   country: string;
 }
 
-export interface Category {
+/** Slim category shape used in master specialization context (no service count). */
+export interface ServiceCategory {
   id: string;
   name: string;
   slug: string;
   icon: string | null;
+}
+
+export interface Category extends ServiceCategory {
   _count: { services: number };
 }
 
@@ -56,6 +60,7 @@ export interface PublicMaster {
   bio: string | null;
   city: City | null;
   masterProfile: { slug: string } | null;
+  masterCategories: { category: ServiceCategory }[];
   _count: { services: number };
   averageRating?: number | null;
   reviewCount?: number;
@@ -80,6 +85,7 @@ export interface MasterProfile {
     workingHours: WorkingHours | null;
     timezone: string;
     services: Service[];
+    masterCategories: { category: ServiceCategory }[];
   };
 }
 
@@ -189,10 +195,11 @@ export class ApiService {
   }
 
   // Masters
-  getMasters(filters?: { city?: string; search?: string }) {
+  getMasters(filters?: { city?: string; category?: string; search?: string }) {
     const params: Record<string, string> = {};
-    if (filters?.city)   params['city']   = filters.city;
-    if (filters?.search) params['search'] = filters.search;
+    if (filters?.city)      params['city']      = filters.city;
+    if (filters?.category)  params['category']  = filters.category;
+    if (filters?.search)    params['search']    = filters.search;
     return this.http.get<PublicMaster[]>('/api/masters', { params });
   }
 
@@ -212,6 +219,10 @@ export class ApiService {
 
   updateMasterProfile(dto: { slug?: string; description?: string; timezone?: string }) {
     return this.http.patch<MasterProfile>('/api/masters/profile', dto);
+  }
+
+  setMasterCategories(categoryIds: string[]) {
+    return this.http.post<MasterProfile>('/api/masters/profile/categories', { categoryIds });
   }
 
   checkSlugAvailability(slug: string, userId?: string) {

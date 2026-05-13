@@ -6,7 +6,7 @@
         <span class="material-icons-outlined auth-card__icon">badge</span>
         <h1 class="auth-card__title">Vytvorte si profil majstra</h1>
         <p class="auth-card__subtitle text-muted">
-          Zvoľte si jedinečnú URL adresu, pod ktorou vás klienti nájdu.
+          Zvoľte si jedinečnú URL adresu a vašu špecializáciu.
         </p>
       </div>
 
@@ -67,6 +67,41 @@
           (ngModelChange)="description.set($event)"
         ></textarea>
         <p class="form-hint text-muted">{{ description().length }}/500</p>
+      </div>
+
+      <!-- Category selection -->
+      <div class="form-group">
+        <div class="cat-header">
+          <label class="form-label">Vaša špecializácia</label>
+          <span class="cat-counter" [class.cat-counter--full]="selectedCount() >= 3">
+            Vybrané: {{ selectedCount() }}/3
+          </span>
+        </div>
+        <p class="form-hint text-muted" style="margin-top: 0; margin-bottom: 12px">Vyberte 1 až 3 kategórie</p>
+
+        @if (categories().length === 0) {
+          <div class="skeleton" style="height: 120px; border-radius: var(--radius-md)"></div>
+        } @else {
+          <div class="cat-grid">
+            @for (cat of categories(); track cat.id) {
+              <button
+                type="button"
+                class="cat-chip"
+                [class.cat-chip--selected]="isCategorySelected(cat.id)"
+                [class.cat-chip--disabled]="!isCategorySelected(cat.id) && selectedCount() >= 3"
+                (click)="toggleCategory(cat.id)"
+                [attr.aria-pressed]="isCategorySelected(cat.id)"
+              >
+                <span class="material-icons-outlined cat-chip__icon">{{ cat.icon }}</span>
+                <span class="cat-chip__name">{{ cat.name }}</span>
+              </button>
+            }
+          </div>
+        }
+
+        @if (selectedCount() === 0 && categories().length > 0) {
+          <p class="form-hint form-hint--error" style="margin-top: 8px">Vyberte aspoň 1 kategóriu</p>
+        }
       </div>
 
       <!-- Error -->

@@ -6,16 +6,29 @@
 </section>
 
 <section class="container">
-  <!-- City filter -->
+  <!-- Filters -->
   <div class="masters-filters">
     <select
       class="form-field__input masters-filters__city"
       [(ngModel)]="selectedCity"
-      (ngModelChange)="onCityChange()"
+      (ngModelChange)="onFilterChange()"
     >
       <option value="">Všetky mestá</option>
       @for (c of cities(); track c.id) {
         <option [value]="c.slug">{{ c.name }}</option>
+      }
+    </select>
+
+    <select
+      class="form-field__input masters-filters__category"
+      [(ngModel)]="selectedCategory"
+      (ngModelChange)="onFilterChange()"
+    >
+      <option value="">Všetky kategórie</option>
+      @for (cat of categories(); track cat.id) {
+        <option [value]="cat.slug">
+          {{ cat.name }}
+        </option>
       }
     </select>
   </div>
@@ -23,7 +36,7 @@
   @if (loading()) {
     <div class="grid">
       @for (i of [1,2,3,4,5,6]; track i) {
-        <div class="skeleton" style="height: 200px; border-radius: var(--radius-lg)"></div>
+        <div class="skeleton" style="height: 220px; border-radius: var(--radius-lg)"></div>
       }
     </div>
   } @else if (masters().length === 0) {
@@ -51,6 +64,19 @@
             @if (m.bio) {
               <p class="master-card__bio">{{ m.bio }}</p>
             }
+
+            <!-- Category chips -->
+            @if (m.masterCategories && m.masterCategories.length > 0) {
+              <div class="master-card__cats">
+                @for (mc of m.masterCategories; track mc.category.id) {
+                  <span class="master-card__cat-chip">
+                    <span class="material-icons-outlined">{{ mc.category.icon }}</span>
+                    {{ mc.category.name }}
+                  </span>
+                }
+              </div>
+            }
+
             <div class="master-card__footer">
               @if (m.city) {
                 <span class="master-card__city">

@@ -2,7 +2,7 @@ import { Component, signal, computed, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { debounceTime, distinctUntilChanged, Subject, switchMap } from 'rxjs';
-import { ApiService } from '../../../core/services/api.service';
+import { ApiService, ServiceCategory } from '../../../core/services/api.service';
 import { AuthService } from '../../../core/services/auth.service';
 
 /** Converts a display name to a slug candidate (client-side preview only). */
@@ -34,6 +34,10 @@ export class CreateProfileComponent implements OnInit {
   submitting = signal(false);
   error = signal('');
 
+  // Category selection
+  categories = signal<ServiceCategory[]>([]);
+  selectedCategoryIds = signal<Set<string>>(new Set());
+
   private slugInput$ = new Subject<string>();
 
   private api = inject(ApiService);
@@ -55,21 +59,27 @@ export class CreateProfileComponent implements OnInit {
     return '';
   });
 
+  readonly selectedCount = computed(() => this.selectedCategoryIds().size);
+
   readonly canSubmit = computed(
     () =>
       !this.slugError() &&
       this.slug().length >= 2 &&
       this.slugAvailable() === true &&
+      this.selectedCount() >= 1 &&
+      this.selectedCount() <= 3 &&
       !this.submitting()
   );
 
   ngOnInit() {
     const user = this.auth.user();
     if (user) {
-      // Pre-fill slug from user's name
       const candidate = toSlugPreview(`${user.firstName} ${user.lastName}`);
       this.slug.set(candidate);
     }
+
+    // Load categories
+    this.api.getCategories().subscribe((cats) => this.categories.set(cats));
 
     // Debounced slug availability check
     this.slugInput$
@@ -94,7 +104,6 @@ export class CreateProfileComponent implements OnInit {
         },
       });
 
-    // Trigger initial check for pre-filled slug
     if (this.slug()) {
       this.onSlugChange(this.slug());
     }
@@ -109,6 +118,21 @@ export class CreateProfileComponent implements OnInit {
     }
   }
 
+  isCategorySelected(id: string): boolean {
+    return this.selectedCategoryIds().has(id);
+  }
+
+  toggleCategory(id: string) {
+    const current = new Set(this.selectedCategoryIds());
+    if (current.has(id)) {
+      current.delete(id);
+    } else {
+      if (current.size >= 3) return; // hard cap at 3
+      current.add(id);
+    }
+    this.selectedCategoryIds.set(current);
+  }
+
   submit() {
     if (!this.canSubmit()) return;
 
@@ -121,7 +145,18 @@ export class CreateProfileComponent implements OnInit {
         description: this.description().trim() || undefined,
       })
       .subscribe({
-        next: () => this.router.navigate(['/dashboard']),
+        next: () => {
+          // After profile created, set selected categories, then go to dashboard
+          this.api
+            .setMasterCategories([...this.selectedCategoryIds()])
+            .subscribe({
+              next: () => this.router.navigate(['/dashboard']),
+              error: () => {
+                // Categories failed but profile was created — still navigate
+                this.router.navigate(['/dashboard']);
+              },
+            });
+        },
         error: (err) => {
           const msg = err?.error?.message;
           this.error.set(

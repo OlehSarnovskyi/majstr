@@ -95,6 +95,13 @@
 
     .material-icons-outlined { color: #43a047; }
   }
+
+  &--category {
+    background: rgb(from var(--color-primary) r g b / 0.08);
+    color: var(--color-primary);
+
+    .material-icons-outlined { color: var(--color-primary); }
+  }
 }
 
 // ── Bio ───────────────────────────────────────────────────────────────────────

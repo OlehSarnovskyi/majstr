@@ -427,6 +427,61 @@
               <span class="form-field__hint">Časy v pracovnom rozvrhu a rezerváciách sú v tejto zóne.</span>
             </div>
 
+            <!-- Specialization categories -->
+            <div class="form-field mt-2">
+              <div class="cat-section-header">
+                <label class="form-field__label">
+                  <span class="material-icons-outlined" style="font-size:16px;vertical-align:-3px">category</span>
+                  Špecializácia
+                </label>
+                @if (!editingCategories()) {
+                  <button class="btn btn--ghost btn--sm" (click)="openCategoryEdit()">
+                    <span class="material-icons-outlined">edit</span> Zmeniť
+                  </button>
+                }
+              </div>
+
+              @if (!editingCategories()) {
+                <!-- Display chips -->
+                <div class="cat-chips">
+                  @if ((p.user.masterCategories ?? []).length === 0) {
+                    <span class="text-muted" style="font-size:0.875rem">Žiadne kategórie. Kliknite na Zmeniť.</span>
+                  }
+                  @for (mc of p.user.masterCategories; track mc.category.id) {
+                    <span class="cat-tag">
+                      <span class="material-icons-outlined">{{ mc.category.icon }}</span>
+                      {{ mc.category.name }}
+                    </span>
+                  }
+                </div>
+              } @else {
+                <!-- Edit grid -->
+                <p class="text-muted" style="font-size:0.8rem;margin-bottom:10px">
+                  Vybrané: {{ pendingCategoryIds().size }}/3
+                </p>
+                <div class="cat-edit-grid">
+                  @for (cat of allCategories(); track cat.id) {
+                    <button
+                      type="button"
+                      class="cat-edit-chip"
+                      [class.cat-edit-chip--selected]="isPendingCategorySelected(cat.id)"
+                      [class.cat-edit-chip--disabled]="!isPendingCategorySelected(cat.id) && pendingCategoryIds().size >= 3"
+                      (click)="togglePendingCategory(cat.id)"
+                    >
+                      <span class="material-icons-outlined">{{ cat.icon }}</span>
+                      {{ cat.name }}
+                    </button>
+                  }
+                </div>
+                <div class="cat-edit-actions">
+                  <button class="btn btn--primary btn--sm" (click)="saveCategories()" [disabled]="savingCategories() || pendingCategoryIds().size < 1">
+                    {{ savingCategories() ? 'Ukladá sa...' : 'Uložiť' }}
+                  </button>
+                  <button class="btn btn--ghost btn--sm" (click)="cancelCategoryEdit()" [disabled]="savingCategories()">Zrušiť</button>
+                </div>
+              }
+            </div>
+
             <!-- Description -->
             @if (p.description) {
               <p class="profile-section__desc">{{ p.description }}</p>
