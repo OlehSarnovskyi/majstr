@@ -1,15 +1,17 @@
 import { Component, OnInit, signal, input, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { ApiService, MasterProfile } from '../../core/services/api.service';
+import { DatePipe, DecimalPipe } from '@angular/common';
+import { ApiService, MasterProfile, ReviewWithClient } from '../../core/services/api.service';
 import { AuthService } from '../../core/services/auth.service';
 import { SeoService } from '../../core/services/seo.service';
+import { StarRatingComponent } from '../../shared/components/star-rating/star-rating.component';
 
 const BIO_LIMIT = 220;
 
 @Component({
   selector: 'app-master-profile',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, DatePipe, DecimalPipe, StarRatingComponent],
   templateUrl: './master-profile.component.html',
   styleUrl: './master-profile.component.scss',
 })
@@ -19,6 +21,8 @@ export class MasterProfileComponent implements OnInit {
   profile = signal<MasterProfile | null>(null);
   loading = signal(true);
   bioExpanded = signal(false);
+  reviews = signal<ReviewWithClient[]>([]);
+  loadingReviews = signal(false);
 
   readonly bioLimit = BIO_LIMIT;
 
@@ -35,8 +39,21 @@ export class MasterProfileComponent implements OnInit {
           `${p.user.firstName} ${p.user.lastName}`,
           `${p.user.firstName} ${p.user.lastName} — profesionálny majster na Majster.sk. ${p.user.services?.length || 0} dostupných služieb.`
         );
+        // Load reviews separately after profile resolves (slug is confirmed)
+        this.loadReviews(p.slug);
       },
       error: () => this.loading.set(false),
+    });
+  }
+
+  loadReviews(slug: string) {
+    this.loadingReviews.set(true);
+    this.api.getMasterReviews(slug).subscribe({
+      next: (r) => {
+        this.reviews.set(r);
+        this.loadingReviews.set(false);
+      },
+      error: () => this.loadingReviews.set(false),
     });
   }
 

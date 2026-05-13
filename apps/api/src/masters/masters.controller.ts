@@ -83,4 +83,10 @@ export class MastersController {
   findOne(@Param('slug') slug: string) {
     return this.mastersService.findOne(slug);
   }
+
+  /** GET /masters/:slug/reviews — public list of reviews for a master. */
+  @Get(':slug/reviews')
+  getReviews(@Param('slug') slug: string) {
+    return this.mastersService.getReviewsForMaster(slug);
+  }
 }

@@ -13,6 +13,7 @@ import { SeoService } from '../../core/services/seo.service';
 import { ToastService } from '../../core/services/toast.service';
 import { ConfirmService } from '../../core/services/confirm.service';
 import { FormsModule } from '@angular/forms';
+import { StarRatingComponent } from '../../shared/components/star-rating/star-rating.component';
 
 const STATUS_SK: Record<string, string> = {
   PENDING: 'Čakajúca',
@@ -24,7 +25,7 @@ const STATUS_SK: Record<string, string> = {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [RouterLink, DatePipe, DecimalPipe, FormsModule],
+  imports: [RouterLink, DatePipe, DecimalPipe, FormsModule, StarRatingComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
 })
@@ -85,6 +86,12 @@ export class DashboardComponent implements OnInit {
   completingBookingId = signal<string | null>(null);
   actualPriceInput = signal<number | null>(null);
   completing = signal(false);
+
+  // Review form state (client only, for COMPLETED bookings)
+  reviewingBookingId = signal<string | null>(null);
+  reviewRating = signal<number>(0);
+  reviewComment = signal<string>('');
+  submittingReview = signal(false);
 
   private api = inject(ApiService);
   auth = inject(AuthService);
@@ -355,5 +362,42 @@ export class DashboardComponent implements OnInit {
         },
       });
     }
+  }
+
+  // ── Review helpers ─────────────────────────────────────────────────────────
+
+  openReviewForm(bookingId: string) {
+    this.reviewingBookingId.set(bookingId);
+    this.reviewRating.set(0);
+    this.reviewComment.set('');
+  }
+
+  cancelReview() {
+    this.reviewingBookingId.set(null);
+  }
+
+  submitReview(bookingId: string) {
+    const rating = this.reviewRating();
+    if (rating < 1 || rating > 5) {
+      this.toast.error('Vyberte hodnotenie (1–5 hviezdičiek)');
+      return;
+    }
+    this.submittingReview.set(true);
+    this.api.createReview({
+      bookingId,
+      rating,
+      comment: this.reviewComment().trim() || undefined,
+    }).subscribe({
+      next: () => {
+        this.submittingReview.set(false);
+        this.reviewingBookingId.set(null);
+        this.loadBookings(); // reload to get review embedded in booking
+        this.toast.success('Hodnotenie odoslané, ďakujeme!');
+      },
+      error: () => {
+        this.submittingReview.set(false);
+        this.toast.error('Nepodarilo sa odoslať hodnotenie');
+      },
+    });
   }
 }

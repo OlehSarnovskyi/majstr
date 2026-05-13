@@ -10,6 +10,7 @@ import { CategoriesModule } from '../categories/categories.module';
 import { ServicesModule } from '../services/services.module';
 import { BookingsModule } from '../bookings/bookings.module';
 import { MastersModule } from '../masters/masters.module';
+import { ReviewsModule } from '../reviews/reviews.module';
 import { OriginMiddleware } from '../common/middleware/origin.middleware';
 import { EmailModule } from '../email/email.module';
 import { SeedModule } from '../seed/seed.module';
@@ -29,6 +30,7 @@ import { SeedModule } from '../seed/seed.module';
     ServicesModule,
     BookingsModule,
     MastersModule,
+    ReviewsModule,
   ],
   controllers: [AppController],
   providers: [

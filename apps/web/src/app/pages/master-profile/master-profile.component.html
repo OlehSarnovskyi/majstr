@@ -66,6 +66,15 @@
       </div>
     </div>
 
+    <!-- ── Rating summary chip ──────────────────────────────────── -->
+    @if ((p.reviewCount ?? 0) > 0) {
+      <div class="rating-summary">
+        <app-star-rating [value]="p.averageRating ?? 0" />
+        <span class="rating-summary__score">{{ p.averageRating | number:'1.1-1' }}</span>
+        <span class="rating-summary__count text-muted">({{ p.reviewCount }} hodnotení)</span>
+      </div>
+    }
+
     <!-- ── Services ───────────────────────────────────────────────── -->
     <section class="services-section">
       <h2 class="services-section__title">Služby</h2>
@@ -87,6 +96,44 @@
                 <p class="svc-card__desc">{{ svc.description }}</p>
                 @if (!auth.isMaster()) {
                   <a [routerLink]="['/booking', svc.id]" class="btn btn--primary btn--sm">Rezervovať</a>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </section>
+
+    <!-- ── Reviews ───────────────────────────────────────────────── -->
+    <section class="reviews-section">
+      <h2 class="reviews-section__title">Hodnotenia</h2>
+
+      @if (loadingReviews()) {
+        <div class="skeleton" style="height: 80px; border-radius: var(--radius-lg)"></div>
+      } @else if (reviews().length === 0) {
+        <p class="text-muted reviews-section__empty">Zatiaľ žiadne hodnotenia.</p>
+      } @else {
+        <div class="reviews-list">
+          @for (r of reviews(); track r.id) {
+            <div class="review-card card">
+              <div class="card__body">
+                <div class="review-card__header">
+                  <div class="review-card__client">
+                    @if (r.booking.client.avatar) {
+                      <img [src]="r.booking.client.avatar" [alt]="r.booking.client.firstName" class="review-card__avatar" />
+                    } @else {
+                      <span class="review-card__initials">{{ r.booking.client.firstName[0] }}{{ r.booking.client.lastName[0] }}</span>
+                    }
+                    <strong>{{ r.booking.client.firstName }} {{ r.booking.client.lastName }}</strong>
+                  </div>
+                  <div class="review-card__meta">
+                    <app-star-rating [value]="r.rating" />
+                    <span class="text-muted review-card__date">{{ r.createdAt | date:'dd.MM.yyyy' }}</span>
+                  </div>
+                </div>
+                <p class="review-card__service text-muted">{{ r.booking.service.name }}</p>
+                @if (r.comment) {
+                  <p class="review-card__comment">{{ r.comment }}</p>
                 }
               </div>
             </div>

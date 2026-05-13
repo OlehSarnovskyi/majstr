@@ -401,6 +401,55 @@ select.form-field__input {
   margin-top: 4px;
 }
 
+// ─── Review form (client, on completed booking cards) ────────────────────────
+
+.review-cta {
+  margin-top: 12px;
+  gap: 4px;
+
+  .material-icons-outlined { font-size: 16px; }
+}
+
+.review-form {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--color-border);
+
+  &__label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--color-text);
+  }
+  &__textarea {
+    margin-top: 10px;
+    resize: vertical;
+    min-height: 60px;
+  }
+  &__actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+  }
+}
+
+.review-submitted {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  &__comment {
+    font-size: 0.875rem;
+    color: var(--color-text-light);
+    line-height: 1.5;
+    margin-top: 4px;
+    white-space: pre-line;
+  }
+}
+
 // ─── Responsive ───────────────────────────────────────────────────────────────
 
 @media (max-width: 640px) {

@@ -57,6 +57,8 @@ export interface PublicMaster {
   city: City | null;
   masterProfile: { slug: string } | null;
   _count: { services: number };
+  averageRating?: number | null;
+  reviewCount?: number;
 }
 
 /** Full profile shape returned by GET /masters/:slug and GET /masters/profile/me. */
@@ -66,6 +68,8 @@ export interface MasterProfile {
   description: string | null;
   isVerified: boolean;
   createdAt: string;
+  averageRating?: number | null;
+  reviewCount?: number;
   user: {
     id: string;
     firstName: string;
@@ -91,6 +95,22 @@ export interface Service {
   master?: Master;
 }
 
+export interface Review {
+  id: string;
+  bookingId: string;
+  rating: number;
+  comment: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ReviewWithClient extends Review {
+  booking: {
+    client: { id: string; firstName: string; lastName: string; avatar: string | null };
+    service: { name: string };
+  };
+}
+
 export interface Booking {
   id: string;
   serviceId: string;
@@ -108,6 +128,7 @@ export interface Booking {
   service: Service;
   client?: { id: string; firstName: string; lastName: string; email?: string | null; phone?: string | null };
   master?: Master;
+  review?: Review | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -220,5 +241,18 @@ export class ApiService {
     const body: Record<string, unknown> = { status };
     if (actualPrice != null) body['actualPrice'] = actualPrice;
     return this.http.patch<Booking>(`/api/bookings/${id}/status`, body);
+  }
+
+  // Reviews
+  createReview(dto: { bookingId: string; rating: number; comment?: string }) {
+    return this.http.post<Review>('/api/reviews', dto);
+  }
+
+  getReviewForBooking(bookingId: string) {
+    return this.http.get<Review | null>(`/api/reviews/booking/${bookingId}`);
+  }
+
+  getMasterReviews(slugOrId: string) {
+    return this.http.get<ReviewWithClient[]>(`/api/masters/${slugOrId}/reviews`);
   }
 }

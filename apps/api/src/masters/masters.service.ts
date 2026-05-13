@@ -7,6 +7,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { Role, Prisma } from '@prisma/client';
 import { CreateMasterProfileDto } from './dto/create-master-profile.dto';
 import { UpdateMasterProfileDto } from './dto/update-master-profile.dto';
+import { ReviewsService } from '../reviews/reviews.service';
 
 /** UUID v4 pattern — used to detect legacy UUID-based lookups */
 const UUID_RE =
@@ -39,7 +40,10 @@ const PROFILE_SELECT = {
 
 @Injectable()
 export class MastersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly reviewsService: ReviewsService,
+  ) {}
 
   // ── Public master listing ────────────────────────────────────────────────
 
@@ -99,7 +103,7 @@ export class MastersService {
       where: { slug: slugOrId },
       select: PROFILE_SELECT,
     });
-    if (bySlug) return bySlug;
+    if (bySlug) return this.attachRatingStats(bySlug);
 
     // UUID fallback — kept for backwards compatibility with old links
     if (UUID_RE.test(slugOrId)) {
@@ -107,10 +111,29 @@ export class MastersService {
         where: { userId: slugOrId },
         select: PROFILE_SELECT,
       });
-      if (byId) return byId;
+      if (byId) return this.attachRatingStats(byId);
     }
 
     throw new NotFoundException('Master not found');
+  }
+
+  /** Fetch reviews for a master (public). */
+  getReviewsForMaster(slugOrId: string) {
+    return this.reviewsService.findByMaster(slugOrId);
+  }
+
+  /** Compute and attach averageRating + reviewCount to a profile object. */
+  private async attachRatingStats<T extends { user: { id: string } }>(profile: T) {
+    const agg = await this.prisma.review.aggregate({
+      where: { booking: { masterId: profile.user.id } },
+      _avg:   { rating: true },
+      _count: { rating: true },
+    });
+    return {
+      ...profile,
+      averageRating: agg._avg.rating != null ? Math.round(agg._avg.rating * 10) / 10 : null,
+      reviewCount:   agg._count.rating,
+    };
   }
 
   // ── Profile management (authenticated) ──────────────────────────────────

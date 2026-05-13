@@ -45,12 +45,13 @@ function getLocalTimeParts(utcDate: Date, timezone: string): { dayKey: string; s
 
 // ─── Prisma result types ──────────────────────────────────────────────────────
 
-// The shape returned by booking queries that include service, client, master.
+// The shape returned by booking queries that include service, client, master (and optionally review).
 type BookingWithRelations = Prisma.BookingGetPayload<{
   include: {
     service: true;
     client: { select: { id: true; firstName: true; lastName: true; email: true; phone: true } };
     master: { select: { id: true; firstName: true; lastName: true; email: true; phone: true; avatar: true } };
+    review: true;
   };
 }>;
 
@@ -165,6 +166,7 @@ export class BookingsService {
         master: {
           select: { id: true, firstName: true, lastName: true, email: true, phone: true, avatar: true },
         },
+        review: true,
       },
     });
 
@@ -195,6 +197,7 @@ export class BookingsService {
         client: {
           select: { id: true, firstName: true, lastName: true, email: true, phone: true },
         },
+        review: true,
       },
       orderBy: { startTime: 'desc' },
     });
@@ -323,6 +326,7 @@ export class BookingsService {
         master: {
           select: { id: true, firstName: true, lastName: true, email: true, phone: true, avatar: true },
         },
+        review: true,
       },
     });
 
