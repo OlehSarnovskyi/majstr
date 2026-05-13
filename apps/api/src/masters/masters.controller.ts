@@ -41,8 +41,8 @@ export class MastersController {
   /** GET /masters/profile/me — returns the caller's own profile (null if none yet). */
   @UseGuards(JwtAuthGuard)
   @Get('profile/me')
-  getMyProfile(@Request() req: { user: { userId: string } }) {
-    return this.mastersService.getMyProfile(req.user.userId);
+  getMyProfile(@Request() req: { user: { id: string } }) {
+    return this.mastersService.getMyProfile(req.user.id);
   }
 
   /** POST /masters/profile — create profile for the authenticated MASTER. */
@@ -50,10 +50,10 @@ export class MastersController {
   @Roles(Role.MASTER)
   @Post('profile')
   createProfile(
-    @Request() req: { user: { userId: string } },
+    @Request() req: { user: { id: string } },
     @Body() dto: CreateMasterProfileDto,
   ) {
-    return this.mastersService.createProfile(req.user.userId, dto);
+    return this.mastersService.createProfile(req.user.id, dto);
   }
 
   /** PATCH /masters/profile — update the authenticated MASTER's profile. */
@@ -61,10 +61,10 @@ export class MastersController {
   @Roles(Role.MASTER)
   @Patch('profile')
   updateProfile(
-    @Request() req: { user: { userId: string } },
+    @Request() req: { user: { id: string } },
     @Body() dto: UpdateMasterProfileDto,
   ) {
-    return this.mastersService.updateProfile(req.user.userId, dto);
+    return this.mastersService.updateProfile(req.user.id, dto);
   }
 
   /** GET /masters/slug/check?slug=xxx — availability check (no auth required). */
