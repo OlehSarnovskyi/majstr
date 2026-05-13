@@ -1,7 +1,7 @@
 import { Route } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 import { guestGuard } from './core/guards/guest.guard';
-import { masterProfileGuard, noProfileGuard } from './core/guards/master-profile.guard';
+import { noProfileGuard } from './core/guards/master-profile.guard';
 
 export const appRoutes: Route[] = [
   {
@@ -110,7 +110,7 @@ export const appRoutes: Route[] = [
   },
   {
     path: 'dashboard',
-    canActivate: [authGuard, masterProfileGuard],
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./pages/dashboard/dashboard.component').then(
         (m) => m.DashboardComponent
