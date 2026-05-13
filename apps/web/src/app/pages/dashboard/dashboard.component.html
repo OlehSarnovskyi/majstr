@@ -190,7 +190,7 @@
                 </div>
 
                 <!-- Price display -->
-                @if (b.status === 'COMPLETED') {
+                @if (b.status === 'COMPLETED' && (b.actualPrice != null || b.estimatedPrice != null)) {
                   <p class="booking-card__price">
                     <span class="material-icons-outlined">payments</span>
                     @if (b.actualPrice != null) {
