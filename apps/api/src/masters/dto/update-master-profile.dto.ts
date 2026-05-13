@@ -1,4 +1,38 @@
-import { IsString, Matches, MaxLength, MinLength, IsOptional } from 'class-validator';
+import {
+  IsString,
+  Matches,
+  MaxLength,
+  MinLength,
+  IsOptional,
+  registerDecorator,
+  ValidationOptions,
+} from 'class-validator';
+
+/** Validates that a string is a recognised IANA timezone identifier. */
+function IsIanaTimezone(options?: ValidationOptions) {
+  return function (object: object, propertyName: string) {
+    registerDecorator({
+      name: 'isIanaTimezone',
+      target: object.constructor,
+      propertyName,
+      options,
+      validator: {
+        validate(value: unknown) {
+          if (typeof value !== 'string') return false;
+          try {
+            Intl.DateTimeFormat(undefined, { timeZone: value });
+            return true;
+          } catch {
+            return false;
+          }
+        },
+        defaultMessage() {
+          return '$property must be a valid IANA timezone (e.g. Europe/Bratislava)';
+        },
+      },
+    });
+  };
+}
 
 export class UpdateMasterProfileDto {
   @IsOptional()
@@ -16,4 +50,8 @@ export class UpdateMasterProfileDto {
   @IsString()
   @MaxLength(500)
   description?: string;
+
+  @IsOptional()
+  @IsIanaTimezone()
+  timezone?: string;
 }

@@ -14,21 +14,19 @@ import { BookingStatus } from '@prisma/client';
 // ─── Timezone helpers ─────────────────────────────────────────────────────────
 
 /**
- * Working hours stored in the DB use the master's local time (Slovakia,
- * Europe/Bratislava). The incoming startTime is always UTC (ISO string from
- * the frontend). We must convert UTC → local before comparing with working
- * hours, otherwise bookings near midnight shift to the wrong day.
+ * Working hours are stored as local-time strings ("HH:MM") in the master's own
+ * timezone (stored on the User record). The incoming startTime is always UTC.
+ * We convert UTC → master-local before comparing so the validation is correct
+ * regardless of where the request originates.
  */
-const MASTER_TIMEZONE = 'Europe/Bratislava';
-
 const WEEKDAY_SHORT: Record<string, string> = {
   Sun: 'sun', Mon: 'mon', Tue: 'tue', Wed: 'wed',
   Thu: 'thu', Fri: 'fri', Sat: 'sat',
 };
 
-function getLocalTimeParts(utcDate: Date): { dayKey: string; slotTime: string } {
+function getLocalTimeParts(utcDate: Date, timezone: string): { dayKey: string; slotTime: string } {
   const parts = new Intl.DateTimeFormat('en-GB', {
-    timeZone: MASTER_TIMEZONE,
+    timeZone: timezone,
     weekday: 'short',   // 'Mon', 'Tue', …
     hour:    '2-digit',
     minute:  '2-digit',
@@ -112,9 +110,10 @@ export class BookingsService {
     > | null;
 
     if (workingHours) {
-      // Convert UTC startTime → Slovakia local time before comparing with
-      // working-hours config (which is stored in local time).
-      const { dayKey, slotTime } = getLocalTimeParts(startTime);
+      // Convert UTC startTime → master's local time before comparing with
+      // working-hours config (stored in master's own timezone).
+      const masterTimezone = service.master.timezone ?? 'Europe/Bratislava';
+      const { dayKey, slotTime } = getLocalTimeParts(startTime, masterTimezone);
       const day = workingHours[dayKey];
 
       if (!day?.enabled) {

@@ -379,6 +379,28 @@ select.form-field__input {
   &__copy { white-space: nowrap; margin-left: auto; }
 }
 
+// ─── Timezone row ────────────────────────────────────────────────────────────
+
+.tz-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  select { flex: 1; }
+}
+
+.tz-saving {
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.form-field__hint {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  margin-top: 4px;
+}
+
 // ─── Responsive ───────────────────────────────────────────────────────────────
 
 @media (max-width: 640px) {

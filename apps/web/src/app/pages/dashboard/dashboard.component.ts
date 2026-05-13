@@ -56,6 +56,29 @@ export class DashboardComponent implements OnInit {
   myProfile = signal<MasterProfile | null>(null);
   loadingProfile = signal(false);
   profileUrlCopied = signal(false);
+  savingTimezone = signal(false);
+
+  readonly timezones: { value: string; label: string }[] = [
+    { value: 'Europe/Bratislava', label: 'Bratislava — CET/CEST (UTC+1/+2)' },
+    { value: 'Europe/Prague',     label: 'Praha — CET/CEST (UTC+1/+2)' },
+    { value: 'Europe/Warsaw',     label: 'Varšava — CET/CEST (UTC+1/+2)' },
+    { value: 'Europe/Vienna',     label: 'Viedeň — CET/CEST (UTC+1/+2)' },
+    { value: 'Europe/Berlin',     label: 'Berlín — CET/CEST (UTC+1/+2)' },
+    { value: 'Europe/Budapest',   label: 'Budapešť — CET/CEST (UTC+1/+2)' },
+    { value: 'Europe/London',     label: 'Londýn — GMT/BST (UTC+0/+1)' },
+    { value: 'Europe/Paris',      label: 'Paríž — CET/CEST (UTC+1/+2)' },
+    { value: 'Europe/Amsterdam',  label: 'Amsterdam — CET/CEST (UTC+1/+2)' },
+    { value: 'Europe/Bucharest',  label: 'Bukurešť — EET/EEST (UTC+2/+3)' },
+    { value: 'Europe/Kiev',       label: 'Kyjev — EET/EEST (UTC+2/+3)' },
+    { value: 'Europe/Moscow',     label: 'Moskva — MSK (UTC+3)' },
+    { value: 'America/New_York',  label: 'New York — ET (UTC-5/-4)' },
+    { value: 'America/Chicago',   label: 'Chicago — CT (UTC-6/-5)' },
+    { value: 'America/Denver',    label: 'Denver — MT (UTC-7/-6)' },
+    { value: 'America/Los_Angeles', label: 'Los Angeles — PT (UTC-8/-7)' },
+    { value: 'Asia/Dubai',        label: 'Dubaj — GST (UTC+4)' },
+    { value: 'Asia/Tokyo',        label: 'Tokio — JST (UTC+9)' },
+    { value: 'UTC',               label: 'UTC (UTC+0)' },
+  ];
 
   // Complete-booking modal
   showCompleteModal = signal(false);
@@ -87,6 +110,21 @@ export class DashboardComponent implements OnInit {
         this.loadingProfile.set(false);
       },
       error: () => this.loadingProfile.set(false),
+    });
+  }
+
+  saveTimezone(value: string) {
+    this.savingTimezone.set(true);
+    this.api.updateMasterProfile({ timezone: value }).subscribe({
+      next: (p) => {
+        this.myProfile.set(p);
+        this.savingTimezone.set(false);
+        this.toast.success('Časová zóna uložená');
+      },
+      error: () => {
+        this.savingTimezone.set(false);
+        this.toast.error('Nepodarilo sa uložiť časovú zónu');
+      },
     });
   }
 

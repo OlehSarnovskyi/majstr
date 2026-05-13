@@ -38,7 +38,12 @@
 
           <!-- Time slots -->
           <div class="form-field">
-            <div class="form-field__label">Čas</div>
+            <div class="form-field__label">
+              Čas
+              @if (service()?.master?.timezone) {
+                <span class="tz-note">{{ service()!.master!.timezone }}</span>
+              }
+            </div>
 
             @if (isDayOff) {
               <div class="day-off">

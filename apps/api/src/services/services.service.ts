@@ -59,6 +59,7 @@ export class ServicesService {
             avatar: true,
             bio: true,
             workingHours: true,
+            timezone: true,
           },
         },
       },

@@ -28,6 +28,7 @@ const PROFILE_SELECT = {
       bio: true,
       city: true,
       workingHours: true,
+      timezone: true,
       services: {
         include: { category: true },
         orderBy: { createdAt: 'desc' as const },
@@ -163,6 +164,8 @@ export class MastersService {
       data: {
         ...(dto.slug        !== undefined && { slug: dto.slug }),
         ...(dto.description !== undefined && { description: dto.description }),
+        // timezone lives on the User record — update via nested write
+        ...(dto.timezone    !== undefined && { user: { update: { timezone: dto.timezone } } }),
       },
       select: PROFILE_SELECT,
     });

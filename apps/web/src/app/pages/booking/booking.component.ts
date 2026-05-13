@@ -15,6 +15,39 @@ const DAY_INDEX: Record<number, keyof WorkingHours> = {
   6: 'sat',
 };
 
+/**
+ * Convert a working-hours slot (e.g. "10:00") on a given date in the
+ * master's timezone into a UTC ISO string ready to send to the API.
+ *
+ * Strategy: treat the slot as if it were UTC, check what the clock in the
+ * target timezone shows at that moment, compute the offset, and adjust.
+ *
+ * Example: date="2026-05-14", slot="10:00", tz="Europe/Bratislava" (UTC+2)
+ *   → naiveUtc = 10:00 UTC → shows "12:00" in Bratislava
+ *   → diff = +120 min → actual UTC = 10:00 − 120 min = 08:00 UTC ✓
+ */
+function slotToUtcIso(date: string, slot: string, timezone: string): string {
+  const naiveUtc = new Date(`${date}T${slot}:00Z`);
+
+  const parts = new Intl.DateTimeFormat('en-GB', {
+    timeZone: timezone,
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).formatToParts(naiveUtc);
+
+  const tzH = Number(parts.find((p) => p.type === 'hour')?.value   ?? 0);
+  const tzM = Number(parts.find((p) => p.type === 'minute')?.value ?? 0);
+  const [wantH, wantM] = slot.split(':').map(Number);
+
+  // Positive = timezone is ahead of UTC (e.g. +120 for UTC+2)
+  let diffMins = (tzH * 60 + tzM) - (wantH * 60 + wantM);
+  if (diffMins >  720) diffMins -= 1440; // handle date-line wrap
+  if (diffMins < -720) diffMins += 1440;
+
+  return new Date(naiveUtc.getTime() - diffMins * 60_000).toISOString();
+}
+
 /** Generates 30-min slots between two "HH:MM" times (exclusive of `to`). */
 function generateSlots(from: string, to: string): string[] {
   const slots: string[] = [];
@@ -126,7 +159,9 @@ export class BookingComponent implements OnInit {
     this.submitting.set(true);
     this.error.set('');
 
-    const startTime = new Date(`${this.date}T${this.selectedSlot}:00`).toISOString();
+    // Slots are always in the master's timezone — convert to UTC explicitly.
+    const masterTz = this.service()?.master?.timezone ?? 'Europe/Bratislava';
+    const startTime = slotToUtcIso(this.date, this.selectedSlot, masterTz);
 
     this.api
       .createBooking({

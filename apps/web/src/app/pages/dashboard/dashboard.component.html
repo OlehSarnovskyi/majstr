@@ -359,6 +359,31 @@
               </div>
             </div>
 
+            <!-- Timezone -->
+            <div class="form-field mt-2">
+              <label class="form-field__label" for="tz-select">
+                <span class="material-icons-outlined" style="font-size:16px;vertical-align:-3px">schedule</span>
+                Časová zóna pracovného rozvrhu
+              </label>
+              <div class="tz-row">
+                <select
+                  id="tz-select"
+                  class="form-field__input"
+                  [value]="p.user.timezone"
+                  (change)="saveTimezone($any($event.target).value)"
+                  [disabled]="savingTimezone()"
+                >
+                  @for (tz of timezones; track tz.value) {
+                    <option [value]="tz.value">{{ tz.label }}</option>
+                  }
+                </select>
+                @if (savingTimezone()) {
+                  <span class="tz-saving text-muted">Ukladá sa...</span>
+                }
+              </div>
+              <span class="form-field__hint">Časy v pracovnom rozvrhu a rezerváciách sú v tejto zóne.</span>
+            </div>
+
             <!-- Description -->
             @if (p.description) {
               <p class="profile-section__desc">{{ p.description }}</p>

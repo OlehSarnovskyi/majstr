@@ -19,6 +19,7 @@ model User {
   bio          String?
   city         String?
   workingHours Json?   @map("working_hours")
+  timezone     String  @default("Europe/Bratislava")
   role      Role     @default(CLIENT)
   roleChosen               Boolean   @default(false) @map("role_chosen")
   emailVerified            Boolean   @default(false) @map("email_verified")

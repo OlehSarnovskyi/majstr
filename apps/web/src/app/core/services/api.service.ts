@@ -35,6 +35,7 @@ export interface Master {
   createdAt?: string;
   phone?: string | null; // returned only in booking context (PENDING/CONFIRMED), never on public profile
   workingHours?: WorkingHours | null;
+  timezone?: string;
   _count?: { services: number };
   services?: Service[];
 }
@@ -66,6 +67,7 @@ export interface MasterProfile {
     bio: string | null;
     city: string | null;
     workingHours: WorkingHours | null;
+    timezone: string;
     services: Service[];
   };
 }
@@ -175,7 +177,7 @@ export class ApiService {
     return this.http.post<MasterProfile>('/api/masters/profile', dto);
   }
 
-  updateMasterProfile(dto: { slug?: string; description?: string }) {
+  updateMasterProfile(dto: { slug?: string; description?: string; timezone?: string }) {
     return this.http.patch<MasterProfile>('/api/masters/profile', dto);
   }
 
