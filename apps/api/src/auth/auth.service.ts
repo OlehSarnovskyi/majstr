@@ -105,6 +105,10 @@ export class AuthService {
       throw new UnauthorizedException('E-mail nie je overený');
     }
 
+    if (user.isBanned) {
+      throw new UnauthorizedException('Váš účet bol zablokovaný');
+    }
+
     return this.buildAuthResponse(user);
   }
 
@@ -232,10 +236,12 @@ export class AuthService {
   }
 
   async validateUser(userId: string) {
-    return this.prisma.user.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: { id: userId },
-      select: USER_AUTH_SELECT,
+      select: { ...USER_AUTH_SELECT, isBanned: true },
     });
+    if (!user || user.isBanned) return null;
+    return user;
   }
 
   async verifyEmail(token: string) {

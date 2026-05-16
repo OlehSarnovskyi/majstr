@@ -11,6 +11,7 @@ import { ServicesModule } from '../services/services.module';
 import { BookingsModule } from '../bookings/bookings.module';
 import { MastersModule } from '../masters/masters.module';
 import { ReviewsModule } from '../reviews/reviews.module';
+import { AdminModule } from '../admin/admin.module';
 import { OriginMiddleware } from '../common/middleware/origin.middleware';
 import { EmailModule } from '../email/email.module';
 import { SeedModule } from '../seed/seed.module';
@@ -31,6 +32,7 @@ import { SeedModule } from '../seed/seed.module';
     BookingsModule,
     MastersModule,
     ReviewsModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [

@@ -34,6 +34,7 @@ model User {
   workingHours Json?   @map("working_hours")
   timezone     String  @default("Europe/Bratislava")
   role      Role     @default(CLIENT)
+  isBanned                 Boolean   @default(false) @map("is_banned")
   roleChosen               Boolean   @default(false) @map("role_chosen")
   emailVerified            Boolean   @default(false) @map("email_verified")
   emailVerificationToken   String?   @map("email_verification_token")
