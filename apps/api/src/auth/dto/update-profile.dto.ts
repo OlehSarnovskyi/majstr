@@ -1,4 +1,4 @@
-import { IsOptional, IsString, MinLength, MaxLength, Matches, IsObject } from 'class-validator';
+import { IsOptional, IsString, MinLength, MaxLength, Matches, IsObject, IsUUID } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class UpdateProfileDto {

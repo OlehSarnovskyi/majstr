@@ -2,7 +2,6 @@ const { NxAppWebpackPlugin } = require('@nx/webpack/app-plugin');
 const { join } = require('path');
 
 module.exports = {
-  externals: [/^@prisma\/client$/, /^\.prisma/, 'class-validator', 'class-transformer'],
   output: {
     path: join(__dirname, 'dist'),
     clean: true,
@@ -21,6 +20,10 @@ module.exports = {
       outputHashing: 'none',
       generatePackageJson: false,
       sourceMap: true,
+      // Externalize ALL node_modules so they're required at runtime from node_modules/
+      // This fixes ReferenceError for class-validator decorators (IsUUID etc.)
+      // that occur when webpack bundles them with circular dependency ordering issues.
+      externalDependencies: 'all',
     }),
   ],
 };
