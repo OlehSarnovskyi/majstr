@@ -33,8 +33,12 @@ import { AdminApiService, AdminCategory } from '../../core/services/admin-api.se
           <tbody>
             @for (cat of categories(); track cat.id) {
               <tr>
-                <td style="font-size: 1.5rem; width: 56px;">
-                  {{ cat.icon ?? '—' }}
+                <td style="width: 56px; text-align: center;">
+                  @if (cat.icon) {
+                    <span class="material-icons" style="font-size: 1.5rem; color: #475569;">{{ cat.icon }}</span>
+                  } @else {
+                    <span>—</span>
+                  }
                 </td>
                 <td style="font-weight: 500;">{{ cat.name }}</td>
                 <td>
