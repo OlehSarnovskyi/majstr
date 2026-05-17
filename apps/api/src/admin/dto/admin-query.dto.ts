@@ -1,5 +1,5 @@
-import { IsEnum, IsInt, IsOptional, IsString, IsUUID, Max, Min } from 'class-validator';
-import { Transform, Type } from 'class-transformer';
+import { IsEnum, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import { Type } from 'class-transformer';
 import { Role, BookingStatus } from '@prisma/client';
 
 export class PaginationDto {
@@ -34,10 +34,10 @@ export class BookingsQueryDto extends PaginationDto {
   @IsOptional() @IsString()
   dateTo?: string;
 
-  @IsOptional() @IsUUID()
+  @IsOptional() @IsString()
   masterId?: string;
 
-  @IsOptional() @IsUUID()
+  @IsOptional() @IsString()
   clientId?: string;
 }
 
