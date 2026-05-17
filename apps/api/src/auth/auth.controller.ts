@@ -67,18 +67,22 @@ export class AuthController {
   }
 
   @Get('google')
-  googleAuth(@Res() res: Response) {
+  googleAuth(@Query('origin') origin: string, @Res() res: Response) {
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:4200';
+    const adminUrl = process.env.ADMIN_URL || 'http://localhost:4201';
+    const targetUrl = origin === 'admin' ? adminUrl : frontendUrl;
+
     if (!process.env.GOOGLE_CLIENT_ID) {
-      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:4200';
-      return res.redirect(`${frontendUrl}/auth/login`);
+      return res.redirect(`${targetUrl}/auth/login`);
     }
 
-    // Stateless CSRF protection: state = random.HMAC(random)
+    // Stateless CSRF protection: state = random.HMAC(random)[.origin]
     // No cookie needed — works across different domains (Vercel + Render)
     const random = crypto.randomBytes(16).toString('hex');
     const secret = process.env.JWT_SECRET || 'dev-only-secret-change-in-production';
     const hmac = crypto.createHmac('sha256', secret).update(random).digest('hex');
-    const state = `${random}.${hmac}`;
+    // Encode origin in state so the callback knows where to redirect
+    const state = origin === 'admin' ? `${random}.${hmac}.admin` : `${random}.${hmac}`;
 
     const callbackUrl =
       process.env.GOOGLE_CALLBACK_URL ||
@@ -112,13 +116,19 @@ export class AuthController {
     @Res() res: Response
   ) {
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:4200';
+    const adminUrl = process.env.ADMIN_URL || 'http://localhost:4201';
 
     // Verify stateless HMAC state (no cookie required)
+    // State format: random.hmac[.origin] — origin is optional, 'admin' redirects to ADMIN_URL
     if (!state || !state.includes('.')) {
       return res.redirect(`${frontendUrl}/auth/login?error=oauth_error`);
     }
 
-    const [random, receivedHmac] = state.split('.');
+    const parts = state.split('.');
+    const [random, receivedHmac, origin] = parts;
+    const isAdmin = origin === 'admin';
+    const targetUrl = isAdmin ? adminUrl : frontendUrl;
+
     const secret = process.env.JWT_SECRET || 'dev-only-secret-change-in-production';
     const expectedHmac = crypto.createHmac('sha256', secret).update(random).digest('hex');
 
@@ -133,7 +143,7 @@ export class AuthController {
     }
 
     if (!valid) {
-      return res.redirect(`${frontendUrl}/auth/login?error=oauth_error`);
+      return res.redirect(`${targetUrl}/auth/login?error=oauth_error`);
     }
 
     const result = await this.authService.googleLogin(req.user);
@@ -148,7 +158,7 @@ export class AuthController {
     });
 
     const params = new URLSearchParams({ code });
-    res.redirect(`${frontendUrl}/auth/callback?${params}`);
+    res.redirect(`${targetUrl}/auth/callback?${params}`);
   }
 
   /** Exchange a one-time OAuth code for a JWT. The code is single-use and expires in 60 s. */

@@ -1,5 +1,6 @@
 import { Route } from '@angular/router';
 import { LoginComponent } from './pages/login/login.component';
+import { AuthCallbackComponent } from './pages/auth-callback/auth-callback.component';
 import { LayoutComponent } from './layout/layout.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { UsersComponent } from './pages/users/users.component';
@@ -10,6 +11,7 @@ import { adminGuard } from './core/guards/admin.guard';
 
 export const appRoutes: Route[] = [
   { path: 'login', component: LoginComponent },
+  { path: 'auth/callback', component: AuthCallbackComponent },
   {
     path: '',
     component: LayoutComponent,
