@@ -444,7 +444,7 @@
               @if (!editingCategories()) {
                 <!-- Display chips -->
                 <div class="cat-chips">
-                  @if ((p.user.masterCategories ?? []).length === 0) {
+                  @if (p.user.masterCategories.length === 0) {
                     <span class="text-muted" style="font-size:0.875rem">Žiadne kategórie. Kliknite na Zmeniť.</span>
                   }
                   @for (mc of p.user.masterCategories; track mc.category.id) {

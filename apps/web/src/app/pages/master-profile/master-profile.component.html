@@ -33,11 +33,11 @@
           <div class="hero__chips">
             @if (p.user.city) {
               <span class="chip">
-                <span class="material-icons-outlined">location_on</span>{{ p.user.city?.name }}
+                <span class="material-icons-outlined">location_on</span>{{ p.user.city.name }}
               </span>
             }
             <span class="chip">
-              <span class="material-icons-outlined">build</span>{{ p.user.services?.length || 0 }} služieb
+              <span class="material-icons-outlined">build</span>{{ p.user.services.length || 0 }} služieb
             </span>
             @for (mc of p.user.masterCategories; track mc.category.id) {
               <span class="chip chip--category">
