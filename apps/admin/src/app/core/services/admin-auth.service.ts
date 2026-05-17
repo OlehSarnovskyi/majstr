@@ -39,18 +39,30 @@ export class AdminAuthService {
       );
   }
 
-  /** Called after Google OAuth code exchange — fetches /auth/me to get full user data */
+  /** Called after Google OAuth code exchange.
+   *  1. Decode JWT to check role immediately (no extra round-trip).
+   *  2. Fetch /auth/me to get full user profile for the session.
+   */
   handleOAuthToken(accessToken: string, router: Router): void {
-    // Temporarily store the token so the interceptor can attach it to the /me request
+    // Decode JWT payload (base64url middle segment) to read role without a round-trip
+    try {
+      const payloadJson = atob(accessToken.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'));
+      const payload = JSON.parse(payloadJson) as { sub: string; email: string; role: string };
+
+      if (payload.role !== 'ADMIN') {
+        router.navigate(['/login'], { queryParams: { error: 'not_admin' } });
+        return;
+      }
+    } catch {
+      router.navigate(['/login'], { queryParams: { error: 'auth_failed' } });
+      return;
+    }
+
+    // Role confirmed — store token and fetch full profile
     localStorage.setItem('admin_token', accessToken);
 
     this.http.get<AdminUser>('/api/auth/me').subscribe({
       next: (user) => {
-        if (user.role !== 'ADMIN') {
-          localStorage.removeItem('admin_token');
-          router.navigate(['/login'], { queryParams: { error: 'not_admin' } });
-          return;
-        }
         this.storeSession(accessToken, user);
         router.navigate(['/']);
       },
