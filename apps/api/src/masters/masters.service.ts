@@ -242,6 +242,33 @@ export class MastersService {
     });
   }
 
+  /**
+   * Generate a unique slug from firstName + lastName.
+   * If "jan-novak" is taken, tries "jan-novak-2", "jan-novak-3", etc.
+   * Excludes the current user's own profile so renaming keeps the same base.
+   */
+  async generateUniqueSlug(firstName: string, lastName: string, excludeUserId?: string): Promise<string> {
+    const base = `${firstName}-${lastName}`
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[̀-ͯ]/g, '')   // strip diacritics
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '');
+
+    let candidate = base;
+    let i = 2;
+    while (true) {
+      const taken = await this.prisma.masterProfile.findUnique({
+        where: { slug: candidate },
+        select: { userId: true },
+      });
+      if (!taken || (excludeUserId && taken.userId === excludeUserId)) {
+        return candidate;
+      }
+      candidate = `${base}-${i++}`;
+    }
+  }
+
   /** Check whether a slug is available.  Returns `{ available: boolean, slug: string }`. */
   async checkSlugAvailability(slug: string, excludeUserId?: string) {
     const existing = await this.prisma.masterProfile.findUnique({

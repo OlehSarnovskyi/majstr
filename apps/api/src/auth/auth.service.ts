@@ -12,6 +12,7 @@ import * as crypto from 'crypto';
 import { PrismaService } from '../prisma/prisma.service';
 import { EmailService } from '../email/email.service';
 import { Role } from '@prisma/client';
+import { MastersService } from '../masters/masters.service';
 
 // Reused in every user query that needs to build an auth response
 const CITY_SELECT = { select: { id: true, name: true, slug: true } } as const;
@@ -37,7 +38,8 @@ export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
-    private readonly emailService: EmailService
+    private readonly emailService: EmailService,
+    private readonly mastersService: MastersService
   ) {}
 
   async register(dto: {
@@ -206,9 +208,32 @@ export class AuthService {
       if (!city) throw new BadRequestException('Vybrané mesto neexistuje');
     }
 
-    return this.prisma.user.update({
+    const updated = await this.prisma.user.update({
       where: { id: userId },
       data: dto,
+      select: { ...USER_AUTH_SELECT, role: true, firstName: true, lastName: true },
+    });
+
+    // When a master changes their name, auto-update the MasterProfile slug
+    if (updated.role === Role.MASTER && (dto.firstName || dto.lastName)) {
+      const profile = await this.prisma.masterProfile.findUnique({ where: { userId } });
+      if (profile) {
+        const newSlug = await this.mastersService.generateUniqueSlug(
+          updated.firstName,
+          updated.lastName,
+          userId
+        );
+        if (newSlug !== profile.slug) {
+          await this.prisma.masterProfile.update({
+            where: { userId },
+            data: { slug: newSlug },
+          });
+        }
+      }
+    }
+
+    return this.prisma.user.findUniqueOrThrow({
+      where: { id: userId },
       select: USER_AUTH_SELECT,
     });
   }

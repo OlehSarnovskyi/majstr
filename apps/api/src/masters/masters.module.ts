@@ -7,5 +7,6 @@ import { ReviewsModule } from '../reviews/reviews.module';
   imports: [ReviewsModule],
   controllers: [MastersController],
   providers: [MastersService],
+  exports: [MastersService],
 })
 export class MastersModule {}
