@@ -9,6 +9,15 @@ interface BookingEmailData {
   status?: string;
 }
 
+/** Format a booking date in Slovak locale, always in Bratislava timezone (UTC+1/+2). */
+function formatDate(date: Date): string {
+  return new Date(date).toLocaleString('sk-SK', {
+    timeZone: 'Europe/Bratislava',
+    dateStyle: 'long',
+    timeStyle: 'short',
+  });
+}
+
 @Injectable()
 export class EmailService {
   private readonly logger = new Logger(EmailService.name);
@@ -31,7 +40,7 @@ export class EmailService {
   }
 
   async sendNewBookingNotification(booking: BookingEmailData) {
-    const dateStr = new Date(booking.startTime).toLocaleString('sk-SK');
+    const dateStr = formatDate(booking.startTime);
 
     await this.sendMail(
       booking.master.email,
@@ -54,9 +63,10 @@ export class EmailService {
     };
     const statusText = statusMap[booking.status ?? ''] ?? booking.status;
     const isCancelled = booking.status === 'CANCELLED';
+    const dateStr = formatDate(booking.startTime);
     const body = isCancelled
-      ? `Dobrý deň ${booking.client.firstName},\n\nVaša rezervácia na službu "${booking.service.name}" dňa ${new Date(booking.startTime).toLocaleString('sk-SK')} bola zrušená.\n\nMajster.sk`
-      : `Dobrý deň ${booking.client.firstName},\n\nVaša rezervácia na službu "${booking.service.name}" dňa ${new Date(booking.startTime).toLocaleString('sk-SK')} bola ${statusText} majstrom ${booking.master.firstName}.\n\nMajster.sk`;
+      ? `Dobrý deň ${booking.client.firstName},\n\nVaša rezervácia na službu "${booking.service.name}" dňa ${dateStr} bola zrušená.\n\nMajster.sk`
+      : `Dobrý deň ${booking.client.firstName},\n\nVaša rezervácia na službu "${booking.service.name}" dňa ${dateStr} bola ${statusText} majstrom ${booking.master.firstName}.\n\nMajster.sk`;
 
     await this.sendMail(
       booking.client.email,
