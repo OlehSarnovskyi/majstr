@@ -60,6 +60,11 @@ export class DashboardComponent implements OnInit {
   profileUrlCopied = signal(false);
   savingTimezone = signal(false);
 
+  /** Categories the master has chosen as their specialization — used in service form. */
+  masterSpecCategories = computed(() =>
+    (this.myProfile()?.user.masterCategories ?? []).map((mc) => mc.category)
+  );
+
   // Category management in profile tab
   allCategories = signal<ServiceCategory[]>([]);
   editingCategories = signal(false);
@@ -295,7 +300,7 @@ export class DashboardComponent implements OnInit {
     this.svcName = '';
     this.svcDesc = '';
     this.svcPrice = 0;
-    this.svcCategoryId = this.categories()[0]?.id || '';
+    this.svcCategoryId = this.masterSpecCategories()[0]?.id || '';
     this.showServiceForm.set(true);
   }
 

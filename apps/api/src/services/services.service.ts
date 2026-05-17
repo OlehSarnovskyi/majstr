@@ -3,6 +3,7 @@ import {
   NotFoundException,
   ForbiddenException,
   ConflictException,
+  BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateServiceDto } from './dto/create-service.dto';
@@ -12,7 +13,22 @@ import { UpdateServiceDto } from './dto/update-service.dto';
 export class ServicesService {
   constructor(private readonly prisma: PrismaService) {}
 
+  /** Ensure the categoryId belongs to the master's chosen specializations. */
+  private async assertCategoryInSpec(masterId: string, categoryId: string) {
+    const profile = await this.prisma.masterProfile.findUnique({
+      where: { userId: masterId },
+      select: { masterCategories: { select: { categoryId: true } } },
+    });
+    const allowed = profile?.masterCategories.map((mc) => mc.categoryId) ?? [];
+    if (!allowed.includes(categoryId)) {
+      throw new BadRequestException(
+        'Kategória musí byť jednou z vašich špecializácií'
+      );
+    }
+  }
+
   async create(masterId: string, dto: CreateServiceDto) {
+    await this.assertCategoryInSpec(masterId, dto.categoryId);
     return this.prisma.service.create({
       data: {
         ...dto,
@@ -81,6 +97,10 @@ export class ServicesService {
 
     if (service.masterId !== masterId) {
       throw new ForbiddenException('You can only update your own services');
+    }
+
+    if (dto.categoryId) {
+      await this.assertCategoryInSpec(masterId, dto.categoryId);
     }
 
     return this.prisma.service.update({

@@ -315,7 +315,7 @@
           <div class="form-field">
             <label class="form-field__label" for="svc-category">Kategória</label>
             <select id="svc-category" class="form-field__input" [(ngModel)]="svcCategoryId">
-              @for (cat of categories(); track cat.id) {
+              @for (cat of masterSpecCategories(); track cat.id) {
                 <option [value]="cat.id">{{ cat.name }}</option>
               }
             </select>
