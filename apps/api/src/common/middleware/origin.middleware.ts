@@ -17,8 +17,11 @@ export class OriginMiddleware implements NestMiddleware {
     const origin = req.headers['origin'];
     if (!origin) return next(); // server-to-server / CLI tools
 
-    const allowed = process.env.FRONTEND_URL || 'http://localhost:4200';
-    if (origin !== allowed) {
+    const allowedOrigins = new Set([
+      process.env.FRONTEND_URL || 'http://localhost:4200',
+      process.env.ADMIN_URL    || 'http://localhost:4201',
+    ]);
+    if (!allowedOrigins.has(origin)) {
       throw new ForbiddenException('Request origin not allowed');
     }
 
