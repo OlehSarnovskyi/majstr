@@ -29,6 +29,7 @@ function createPrismaMock() {
     },
     booking: {
       findFirst: jest.fn(),
+      findUnique: jest.fn(),
       findMany: jest.fn(),
       create: jest.fn(),
       update: jest.fn(),
@@ -236,6 +237,7 @@ describe('BookingsController (e2e)', () => {
       const start = futureDate(2);
       const priceAtBookingTime = testService.price;
 
+      prismaMock.user.findUnique.mockResolvedValue(testClient);
       prismaMock.service.findUnique.mockResolvedValue(testService);
       prismaMock.booking.findFirst.mockResolvedValue(null);
       prismaMock.booking.create.mockResolvedValue(
@@ -254,6 +256,7 @@ describe('BookingsController (e2e)', () => {
     });
 
     it('should return 400 when serviceId is missing', async () => {
+      prismaMock.user.findUnique.mockResolvedValue(testClient);
       await supertest(app.getHttpServer())
         .post('/api/bookings')
         .set('Authorization', `Bearer ${makeToken(testClient)}`)
@@ -262,6 +265,7 @@ describe('BookingsController (e2e)', () => {
     });
 
     it('should return 400 when serviceId is not a valid UUID', async () => {
+      prismaMock.user.findUnique.mockResolvedValue(testClient);
       await supertest(app.getHttpServer())
         .post('/api/bookings')
         .set('Authorization', `Bearer ${makeToken(testClient)}`)
