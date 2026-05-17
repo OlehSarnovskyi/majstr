@@ -1,7 +1,6 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { Observable, tap } from 'rxjs';
 
 export interface AdminUser {
   id: string;
@@ -24,19 +23,6 @@ export class AdminAuthService {
     } catch {
       return null;
     }
-  }
-
-  login(email: string, password: string): Observable<{ accessToken: string; user: AdminUser }> {
-    return this.http
-      .post<{ accessToken: string; user: AdminUser }>('/api/auth/login', { email, password })
-      .pipe(
-        tap((res) => {
-          if (res.user.role !== 'ADMIN') {
-            throw new Error('Not an admin');
-          }
-          this.storeSession(res.accessToken, res.user);
-        }),
-      );
   }
 
   /** Called after Google OAuth code exchange.
