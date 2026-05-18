@@ -15,6 +15,7 @@ import { AdminModule } from '../admin/admin.module';
 import { OriginMiddleware } from '../common/middleware/origin.middleware';
 import { EmailModule } from '../email/email.module';
 import { SeedModule } from '../seed/seed.module';
+import { DevController } from '../dev/dev.controller';
 
 @Module({
   imports: [
@@ -34,7 +35,7 @@ import { SeedModule } from '../seed/seed.module';
     ReviewsModule,
     AdminModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, DevController],
   providers: [
     AppService,
     { provide: APP_GUARD, useClass: CustomThrottlerGuard },

@@ -170,9 +170,17 @@ export class BookingsService {
       },
     });
 
-    this.emailService.sendNewBookingNotification({
-      ...booking,
+    this.emailService.sendNewBookingToMaster({
+      booking: {
+        id: booking.id,
+        startTime: booking.startTime,
+        address: booking.address,
+        note: booking.note,
+        estimatedPrice: booking.estimatedPrice != null ? Number(booking.estimatedPrice) : null,
+      },
       service: { name: booking.service?.name ?? 'Neznáma služba' },
+      client: booking.client,
+      master: booking.master,
     }).catch((err) =>
       this.logger.error('Failed to send new booking notification', err)
     );
@@ -333,12 +341,39 @@ export class BookingsService {
       },
     });
 
-    this.emailService.sendBookingStatusUpdate({
-      ...updated,
-      service: { name: updated.service?.name ?? 'Neznáma služba' },
-    }).catch((err) =>
-      this.logger.error('Failed to send booking status update email', err)
-    );
+    const serviceName = updated.service?.name ?? 'Neznáma služba';
+
+    if (updated.status === BookingStatus.CONFIRMED) {
+      this.emailService.sendBookingConfirmedToClient({
+        booking: {
+          id: updated.id,
+          startTime: updated.startTime,
+          address: updated.address,
+          estimatedPrice: updated.estimatedPrice != null ? Number(updated.estimatedPrice) : null,
+        },
+        service: { name: serviceName },
+        master: updated.master,
+        client: updated.client,
+      }).catch((err) => this.logger.error('Failed to send booking confirmed email', err));
+
+    } else if (updated.status === BookingStatus.CANCELLED) {
+      const cancelledBy: 'master' | 'client' = userId === updated.masterId ? 'master' : 'client';
+      this.emailService.sendBookingCancelled({
+        booking: { id: updated.id, startTime: updated.startTime },
+        service: { name: serviceName },
+        master: updated.master,
+        client: updated.client,
+        cancelledBy,
+      }).catch((err) => this.logger.error('Failed to send booking cancelled email', err));
+
+    } else if (updated.status === BookingStatus.COMPLETED) {
+      this.emailService.sendBookingCompletedToClient({
+        booking: { id: updated.id, startTime: updated.startTime },
+        service: { name: serviceName },
+        master: updated.master,
+        client: updated.client,
+      }).catch((err) => this.logger.error('Failed to send booking completed email', err));
+    }
 
     return this.serializeBooking(updated);
   }

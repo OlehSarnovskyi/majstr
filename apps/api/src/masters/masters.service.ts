@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
@@ -10,6 +11,7 @@ import { CreateMasterProfileDto } from './dto/create-master-profile.dto';
 import { UpdateMasterProfileDto } from './dto/update-master-profile.dto';
 import { SetMasterCategoriesDto } from './dto/set-master-categories.dto';
 import { ReviewsService } from '../reviews/reviews.service';
+import { EmailService } from '../email/email.service';
 
 /** UUID v4 pattern — used to detect legacy UUID-based lookups */
 const UUID_RE =
@@ -49,9 +51,12 @@ const PROFILE_SELECT = {
 
 @Injectable()
 export class MastersService {
+  private readonly logger = new Logger(MastersService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly reviewsService: ReviewsService,
+    private readonly emailService: EmailService,
   ) {}
 
   // ── Public master listing ────────────────────────────────────────────────
@@ -176,7 +181,7 @@ export class MastersService {
     // Guard: slug must be unique
     await this.assertSlugFree(dto.slug);
 
-    return this.prisma.masterProfile.create({
+    const profile = await this.prisma.masterProfile.create({
       data: {
         userId,
         slug: dto.slug,
@@ -184,6 +189,21 @@ export class MastersService {
       },
       select: PROFILE_SELECT,
     });
+
+    // Fetch the user's email for the welcome email
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { email: true, firstName: true },
+    });
+
+    if (user) {
+      this.emailService.sendWelcomeMaster({
+        user: { firstName: user.firstName, email: user.email },
+        slug: dto.slug,
+      }).catch((err) => this.logger.error('Welcome master email failed', err));
+    }
+
+    return profile;
   }
 
   /** Update the authenticated MASTER's profile (slug and/or description). */

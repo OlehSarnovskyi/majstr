@@ -1,22 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { BrevoClient } from '@getbrevo/brevo';
+import { renderNewBookingMaster } from './templates/new-booking-master';
+import { renderBookingConfirmedClient } from './templates/booking-confirmed-client';
+import { renderBookingCancelled } from './templates/booking-cancelled';
+import { renderBookingCompletedClient } from './templates/booking-completed-client';
+import { renderWelcomeMaster } from './templates/welcome-master';
+import { renderWelcomeClient } from './templates/welcome-client';
 
-interface BookingEmailData {
-  service: { name: string };
-  client: { firstName: string; email: string };
-  master: { firstName: string; email: string };
-  startTime: Date;
-  status?: string;
-}
-
-/** Format a booking date in Slovak locale, always in Bratislava timezone (UTC+1/+2). */
-function formatDate(date: Date): string {
-  return new Date(date).toLocaleString('sk-SK', {
-    timeZone: 'Europe/Bratislava',
-    dateStyle: 'long',
-    timeStyle: 'short',
-  });
-}
+const FRONTEND_URL = process.env['FRONTEND_URL'] || 'https://majster-sk.vercel.app';
 
 @Injectable()
 export class EmailService {
@@ -26,8 +17,8 @@ export class EmailService {
   private readonly senderName = 'Majster.sk';
 
   constructor() {
-    const apiKey = process.env.BREVO_API_KEY;
-    this.senderEmail = process.env.BREVO_SENDER_EMAIL || 'noreply@majster.sk';
+    const apiKey = process.env['BREVO_API_KEY'];
+    this.senderEmail = process.env['BREVO_SENDER_EMAIL'] || 'noreply@majster.sk';
 
     if (apiKey) {
       this.client = new BrevoClient({ apiKey });
@@ -39,44 +30,114 @@ export class EmailService {
     }
   }
 
-  async sendNewBookingNotification(booking: BookingEmailData) {
-    const dateStr = formatDate(booking.startTime);
+  // ─── New booking methods ────────────────────────────────────────────────────
 
-    await this.sendMail(
-      booking.master.email,
-      `Nová rezervácia: ${booking.service.name}`,
-      `Dobrý deň ${booking.master.firstName},\n\nMáte novú rezerváciu od ${booking.client.firstName} na službu "${booking.service.name}" dňa ${dateStr}.\n\nProsím prihláste sa a potvrďte alebo zamietnte rezerváciu.\n\nMajster.sk`
-    );
-
-    await this.sendMail(
-      booking.client.email,
-      `Rezervácia prijatá: ${booking.service.name}`,
-      `Dobrý deň ${booking.client.firstName},\n\nVaša rezervácia na službu "${booking.service.name}" u majstra ${booking.master.firstName} dňa ${dateStr} bola odoslaná a čaká na potvrdenie.\n\nMajster.sk`
-    );
-  }
-
-  async sendBookingStatusUpdate(booking: BookingEmailData) {
-    const statusMap: Record<string, string> = {
-      CONFIRMED: 'potvrdená',
-      CANCELLED: 'zrušená',
-      COMPLETED: 'dokončená',
+  async sendNewBookingToMaster(data: {
+    booking: {
+      id: string;
+      startTime: Date | string;
+      address: string | null;
+      note: string | null;
+      estimatedPrice: number | null;
     };
-    const statusText = statusMap[booking.status ?? ''] ?? booking.status;
-    const isCancelled = booking.status === 'CANCELLED';
-    const dateStr = formatDate(booking.startTime);
-    const body = isCancelled
-      ? `Dobrý deň ${booking.client.firstName},\n\nVaša rezervácia na službu "${booking.service.name}" dňa ${dateStr} bola zrušená.\n\nMajster.sk`
-      : `Dobrý deň ${booking.client.firstName},\n\nVaša rezervácia na službu "${booking.service.name}" dňa ${dateStr} bola ${statusText} majstrom ${booking.master.firstName}.\n\nMajster.sk`;
-
-    await this.sendMail(
-      booking.client.email,
-      `Rezervácia ${statusText}: ${booking.service.name}`,
-      body
-    );
+    service: { name: string };
+    client: { firstName: string; lastName: string; email: string; phone?: string | null };
+    master: { firstName: string; email: string };
+  }): Promise<void> {
+    const { subject, html, text } = renderNewBookingMaster({
+      ...data,
+      frontendUrl: FRONTEND_URL,
+    });
+    await this.sendMail(data.master.email, subject, text, html);
   }
+
+  async sendBookingConfirmedToClient(data: {
+    booking: {
+      id: string;
+      startTime: Date | string;
+      address: string | null;
+      estimatedPrice: number | null;
+    };
+    service: { name: string };
+    master: { firstName: string; lastName: string; phone?: string | null };
+    client: { firstName: string; email: string };
+  }): Promise<void> {
+    const { subject, html, text } = renderBookingConfirmedClient({
+      ...data,
+      frontendUrl: FRONTEND_URL,
+    });
+    await this.sendMail(data.client.email, subject, text, html);
+  }
+
+  async sendBookingCancelled(data: {
+    booking: { id: string; startTime: Date | string };
+    service: { name: string };
+    master: { firstName: string; lastName: string; email: string };
+    client: { firstName: string; lastName: string; email: string };
+    cancelledBy: 'master' | 'client';
+  }): Promise<void> {
+    const { booking, service, master, client, cancelledBy } = data;
+
+    // Determine recipient: send to the OTHER party
+    if (cancelledBy === 'master') {
+      // Master cancelled → notify client
+      const { subject, html, text } = renderBookingCancelled({
+        booking, service, master, client,
+        cancelledBy,
+        recipient: 'client',
+        frontendUrl: FRONTEND_URL,
+      });
+      await this.sendMail(client.email, subject, text, html);
+    } else {
+      // Client cancelled → notify master
+      const { subject, html, text } = renderBookingCancelled({
+        booking, service, master, client,
+        cancelledBy,
+        recipient: 'master',
+        frontendUrl: FRONTEND_URL,
+      });
+      await this.sendMail(master.email, subject, text, html);
+    }
+  }
+
+  async sendBookingCompletedToClient(data: {
+    booking: { id: string; startTime: Date | string };
+    service: { name: string };
+    master: { firstName: string; lastName: string };
+    client: { firstName: string; email: string };
+  }): Promise<void> {
+    const { subject, html, text } = renderBookingCompletedClient({
+      ...data,
+      frontendUrl: FRONTEND_URL,
+    });
+    await this.sendMail(data.client.email, subject, text, html);
+  }
+
+  async sendWelcomeMaster(data: {
+    user: { firstName: string; email: string };
+    slug: string;
+  }): Promise<void> {
+    const { subject, html, text } = renderWelcomeMaster({
+      ...data,
+      frontendUrl: FRONTEND_URL,
+    });
+    await this.sendMail(data.user.email, subject, text, html);
+  }
+
+  async sendWelcomeClient(data: {
+    user: { firstName: string; email: string };
+  }): Promise<void> {
+    const { subject, html, text } = renderWelcomeClient({
+      user: data.user,
+      frontendUrl: FRONTEND_URL,
+    });
+    await this.sendMail(data.user.email, subject, text, html);
+  }
+
+  // ─── Legacy / existing methods ─────────────────────────────────────────────
 
   async sendPasswordResetEmail(to: string, firstName: string, token: string) {
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:4200';
+    const frontendUrl = process.env['FRONTEND_URL'] || 'http://localhost:4200';
     const resetUrl = `${frontendUrl}/auth/reset-password?token=${token}`;
     await this.sendMail(
       to,
@@ -86,7 +147,7 @@ export class EmailService {
   }
 
   async sendWelcomeEmail(to: string, firstName: string) {
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:4200';
+    const frontendUrl = process.env['FRONTEND_URL'] || 'http://localhost:4200';
     await this.sendMail(
       to,
       'Vitajte na Majster.sk! 🎉',
@@ -103,7 +164,7 @@ export class EmailService {
   }
 
   async sendEmailVerification(to: string, firstName: string, token: string) {
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:4200';
+    const frontendUrl = process.env['FRONTEND_URL'] || 'http://localhost:4200';
     const verifyUrl = `${frontendUrl}/auth/verify-email?token=${token}`;
     await this.sendMail(
       to,
@@ -112,7 +173,9 @@ export class EmailService {
     );
   }
 
-  private async sendMail(to: string, subject: string, text: string) {
+  // ─── Core send ─────────────────────────────────────────────────────────────
+
+  private async sendMail(to: string, subject: string, text: string, html?: string) {
     if (!this.client) {
       this.logger.log(`[DEV - no Brevo] Email to ${to} | Subject: ${subject}`);
       this.logger.debug(text);
@@ -127,11 +190,15 @@ export class EmailService {
         to: [{ email: to }],
         subject,
         textContent: text,
+        ...(html ? { htmlContent: html } : {}),
       });
       this.logger.log(`✅ Email sent to ${to}`);
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : String(error);
-      this.logger.error(`❌ Failed to send email to ${to}: ${msg}`, error instanceof Error ? error.stack : undefined);
+      this.logger.error(
+        `❌ Failed to send email to ${to}: ${msg}`,
+        error instanceof Error ? error.stack : undefined
+      );
     }
   }
 }

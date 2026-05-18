@@ -195,6 +195,14 @@ export class AuthService {
       },
       include: { city: true },
     });
+
+    // Send welcome email to clients when they finalize their role
+    if (role === Role.CLIENT) {
+      this.emailService
+        .sendWelcomeClient({ user: { firstName: user.firstName, email: user.email } })
+        .catch((err) => this.logger.error('Failed to send welcome client email', err));
+    }
+
     return this.buildAuthResponse(user);
   }
 
