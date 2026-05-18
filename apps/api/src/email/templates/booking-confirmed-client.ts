@@ -44,7 +44,7 @@ export function renderBookingConfirmedClient(data: BookingConfirmedClientData): 
     <p style="font-size:14px;color:#64748B;font-family:Arial,Helvetica,sans-serif;margin:16px 0 0 0;">
       V prípade otázok kontaktujte majstra priamo cez telefón alebo cez dashboard.
     </p>
-    ${signOff()}
+    ${signOff(frontendUrl)}
   `, `Rezervácia na ${service.name} bola potvrdená`);
 
   const text = `Dobrý deň, ${client.firstName},

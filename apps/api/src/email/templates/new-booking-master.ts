@@ -41,7 +41,7 @@ export function renderNewBookingMaster(data: NewBookingMasterData): { subject: s
     </p>
     ${infoTable(rows)}
     ${ctaButton('Zobraziť rezerváciu', bookingUrl)}
-    ${signOff()}
+    ${signOff(frontendUrl)}
   `, `Nová rezervácia od ${clientFullName} na ${service.name}`);
 
   const text = `Dobrý deň, ${master.firstName},

@@ -48,7 +48,7 @@ export function renderWelcomeMaster(data: WelcomeMasterData): { subject: string;
       <a href="${profileUrl}" style="color:#0D9488;text-decoration:underline;word-break:break-all;">${profileUrl}</a>
     </p>
     ${ctaButton('Otvoriť dashboard', dashboardUrl)}
-    ${signOff()}
+    ${signOff(frontendUrl)}
   `, `Váš majsterský profil na Majster.sk je aktívny`);
 
   const text = `Dobrý deň, ${user.firstName},

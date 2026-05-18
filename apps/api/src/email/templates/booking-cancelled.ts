@@ -60,7 +60,7 @@ export function renderBookingCancelled(data: BookingCancelledData): { subject: s
     </p>
     ${infoTable(rows)}
     ${recipient === 'client' && cancelledBy === 'master' ? ctaButton('Vyhľadať iného majstra', `${frontendUrl}/services`) : ctaButton('Zobraziť rezervácie', bookingUrl)}
-    ${signOff()}
+    ${signOff(frontendUrl)}
   `, `Rezervácia na ${service.name} bola zrušená`);
 
   const ctaText = recipient === 'client' && cancelledBy === 'master'

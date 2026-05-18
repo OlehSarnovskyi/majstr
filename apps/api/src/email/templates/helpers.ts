@@ -61,11 +61,11 @@ export function greeting(firstName: string): string {
 }
 
 /** Sign-off block. */
-export function signOff(): string {
+export function signOff(frontendUrl = 'https://majster.sk'): string {
   return `
 ${divider()}
 <p style="font-size:14px;color:#64748B;font-family:Arial,Helvetica,sans-serif;margin:16px 0 0 0;">
   S pozdravom,<br/>
-  <strong style="color:#0D9488;">Tím Majster.sk</strong>
+  <a href="${frontendUrl}" style="color:#0D9488;text-decoration:none;font-weight:700;">Tím Majster.sk</a>
 </p>`;
 }

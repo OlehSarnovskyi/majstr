@@ -36,7 +36,7 @@ export function renderWelcomeClient(data: WelcomeClientData): { subject: string;
       </tr>
     </table>
     ${ctaButton('Začať hľadať majstra', servicesUrl)}
-    ${signOff()}
+    ${signOff(frontendUrl)}
   `, `Začnite hľadať skvelých remeselníkov na Majster.sk`);
 
   const text = `Dobrý deň, ${user.firstName},
