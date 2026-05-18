@@ -228,7 +228,9 @@
                       @if (auth.isMaster() && isPast(b.startTime)) {
                         <button class="btn btn--primary btn--sm" (click)="openCompleteModal(b.id)">Označiť ako dokončené</button>
                       }
-                      <button class="btn btn--ghost btn--sm" (click)="updateStatus(b.id, 'CANCELLED')">Zrušiť</button>
+                      @if (!isPast(b.startTime)) {
+                        <button class="btn btn--ghost btn--sm" (click)="updateStatus(b.id, 'CANCELLED')">Zrušiť</button>
+                      }
                     </div>
                   </div>
                 }
