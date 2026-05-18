@@ -520,6 +520,64 @@ select.form-field__input {
   }
 }
 
+// ─── Empty state ─────────────────────────────────────────────────────────────
+
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+
+  &__icon { font-size: 3rem; display: block; margin-bottom: 16px; }
+  &__title { font-size: 1.125rem; font-weight: 600; color: var(--color-text); margin-bottom: 8px; }
+  &__text { color: var(--color-text-muted); font-size: 0.9rem; margin-bottom: 20px; max-width: 320px; margin-left: auto; margin-right: auto; }
+}
+
+// ─── Form hint ────────────────────────────────────────────────────────────────
+
+.form-hint {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+// ─── Welcome modal ────────────────────────────────────────────────────────────
+
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 500;
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+}
+
+.modal-box {
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 440px;
+  width: 100%;
+  position: relative;
+
+  &__title { font-size: 1.5rem; font-weight: 700; margin-bottom: 8px; }
+  &__subtitle { margin-bottom: 20px; }
+  &__steps {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 24px 0;
+    display: flex; flex-direction: column; gap: 12px;
+    li { font-size: 0.95rem; line-height: 1.5; }
+  }
+  &__actions { display: flex; gap: 12px; flex-wrap: wrap; }
+  &__close {
+    position: absolute; top: 16px; right: 16px;
+    background: none; border: none;
+    font-size: 1.1rem; color: var(--color-text-muted);
+    cursor: pointer; padding: 4px 8px;
+    &:hover { color: var(--color-text); }
+  }
+}
+
 // ─── Responsive ───────────────────────────────────────────────────────────────
 
 @media (max-width: 640px) {

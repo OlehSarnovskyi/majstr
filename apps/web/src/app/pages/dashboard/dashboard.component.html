@@ -52,14 +52,20 @@
         <div class="skeleton mb-2" style="height: 110px; border-radius: var(--radius-lg)"></div>
       }
     } @else if (bookings().length === 0) {
-      <div class="empty">
-        <span class="material-icons-outlined">event_busy</span>
-        <h3>Zatiaľ žiadne rezervácie</h3>
-        @if (!auth.isMaster()) {
-          <p class="text-muted">Prehliadajte služby a vytvorte svoju prvú rezerváciu</p>
-          <a routerLink="/categories" class="btn btn--primary mt-2">Prehliadať služby</a>
-        }
-      </div>
+      @if (auth.isMaster()) {
+        <div class="empty-state">
+          <span class="empty-state__icon">📅</span>
+          <h3 class="empty-state__title">Zatiaľ žiadne rezervácie</h3>
+          <p class="empty-state__text">Po pridaní služieb začnú klienti rezervovať váš čas.</p>
+        </div>
+      } @else {
+        <div class="empty-state">
+          <span class="empty-state__icon">🔍</span>
+          <h3 class="empty-state__title">Zatiaľ ste si nič nerezervovali</h3>
+          <p class="empty-state__text">Nájdite majstra pre vaše domáce projekty.</p>
+          <a class="btn btn--primary" routerLink="/services">Vyhľadať majstra</a>
+        </div>
+      }
     } @else {
       @if (pendingBookings().length > 0) {
         <h2 class="section-label">Čakajúce</h2>
@@ -311,6 +317,7 @@
             } @else if (svcPrice > 100000) {
               <span class="form-field__error">Maximálna cena je 100 000 &euro;</span>
             }
+            <small class="form-hint">Orientačná cena. Konečná suma sa môže líšiť po obhliadke.</small>
           </div>
           <div class="form-field">
             <label class="form-field__label" for="svc-category">Kategória</label>
@@ -335,10 +342,11 @@
         <div class="skeleton mt-2" style="height: 100px; border-radius: var(--radius-lg)"></div>
       }
     } @else if (myServices().length === 0 && !showServiceForm()) {
-      <div class="empty mt-3">
-        <span class="material-icons-outlined">build_circle</span>
-        <h3>Zatiaľ žiadne služby</h3>
-        <p class="text-muted">Pridajte svoju prvú službu a začnite prijímať rezervácie</p>
+      <div class="empty-state mt-3">
+        <span class="empty-state__icon">🔨</span>
+        <h3 class="empty-state__title">Ešte nemáte žiadne služby</h3>
+        <p class="empty-state__text">Pridajte vašu prvú službu — napríklad "Výmena zásuvky" alebo "Maľovanie izby".</p>
+        <button class="btn btn--primary" (click)="openNewService()">+ Pridať službu</button>
       </div>
     } @else {
       <div class="my-services mt-2">
@@ -368,6 +376,25 @@
         }
       </div>
     }
+  }
+
+  @if (showWelcomeModal()) {
+    <div class="modal-overlay" (click)="closeWelcomeModal()">
+      <div class="modal-box" (click)="$event.stopPropagation()">
+        <h2 class="modal-box__title">Vitajte v Majster.sk! 🎉</h2>
+        <p class="modal-box__subtitle text-muted">Váš profil je aktívny. Tu sú 3 kroky, ako začať:</p>
+        <ol class="modal-box__steps">
+          <li>1️⃣ <strong>Pridajte vaše služby</strong> s cenami</li>
+          <li>2️⃣ <strong>Zdieľajte odkaz</strong> na profil cez WhatsApp, SMS, Facebook</li>
+          <li>3️⃣ <strong>Prijímajte rezervácie</strong> a získavajte hodnotenia</li>
+        </ol>
+        <div class="modal-box__actions">
+          <button class="btn btn--primary" (click)="closeWelcomeModal()">Začať</button>
+          <a class="btn btn--ghost" href="https://www.youtube.com" target="_blank" rel="noopener">▶ Pozrieť video</a>
+        </div>
+        <button class="modal-box__close" (click)="closeWelcomeModal()" aria-label="Zavrieť">✕</button>
+      </div>
+    </div>
   }
 
   @if (activeTab() === 'profile' && auth.isMaster()) {

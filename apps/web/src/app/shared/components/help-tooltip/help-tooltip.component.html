@@ -1,0 +1,9 @@
+<span class="help-tooltip" (click)="toggle(); $event.stopPropagation()">
+  <span class="help-tooltip__icon" [class.help-tooltip__icon--active]="visible()">?</span>
+  @if (visible()) {
+    <span class="help-tooltip__popup" role="tooltip">
+      {{ text }}
+      <span class="help-tooltip__arrow"></span>
+    </span>
+  }
+</span>

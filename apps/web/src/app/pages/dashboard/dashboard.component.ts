@@ -17,10 +17,10 @@ import { FormsModule } from '@angular/forms';
 import { StarRatingComponent } from '../../shared/components/star-rating/star-rating.component';
 
 const STATUS_SK: Record<string, string> = {
-  PENDING: 'Čakajúca',
-  CONFIRMED: 'Potvrdená',
-  CANCELLED: 'Zrušená',
-  COMPLETED: 'Dokončená',
+  PENDING: '⏳ Čaká na potvrdenie',
+  CONFIRMED: '✓ Potvrdená',
+  COMPLETED: '✓✓ Dokončená',
+  CANCELLED: '✗ Zrušená',
 };
 
 @Component({
@@ -99,6 +99,9 @@ export class DashboardComponent implements OnInit {
   actualPriceInput = signal<number | null>(null);
   completing = signal(false);
 
+  // Welcome modal for first-time masters
+  showWelcomeModal = signal(false);
+
   // Review form state (client only, for COMPLETED bookings)
   reviewingBookingId = signal<string | null>(null);
   reviewRating = signal<number>(0);
@@ -122,6 +125,21 @@ export class DashboardComponent implements OnInit {
       this.loadServices();
       this.loadProfile();
     }
+    this.checkWelcomeModal();
+  }
+
+  private checkWelcomeModal() {
+    const user = this.auth.user();
+    if (!user || user.role !== 'MASTER') return;
+    const key = `welcome_shown_${user.id}`;
+    if (!localStorage.getItem(key)) {
+      setTimeout(() => this.showWelcomeModal.set(true), 800);
+      localStorage.setItem(key, 'true');
+    }
+  }
+
+  closeWelcomeModal() {
+    this.showWelcomeModal.set(false);
   }
 
   loadProfile() {

@@ -1,0 +1,63 @@
+.help-tooltip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  margin-left: 6px;
+  cursor: pointer;
+  vertical-align: middle;
+
+  &__icon {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #CBD5E1;
+    color: #475569;
+    font-size: 10px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+    font-style: normal;
+    line-height: 1;
+    font-family: Arial, sans-serif;
+
+    &:hover, &--active {
+      background: #0D9488;
+      color: white;
+    }
+  }
+
+  &__popup {
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1E293B;
+    color: #F8FAFC;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    padding: 10px 14px;
+    border-radius: 8px;
+    width: 240px;
+    z-index: 1000;
+    white-space: normal;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    pointer-events: none;
+
+    // Keep popup on screen when near left edge
+    @media (max-width: 400px) {
+      left: 0;
+      transform: none;
+    }
+  }
+
+  &__arrow {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: #1E293B;
+  }
+}

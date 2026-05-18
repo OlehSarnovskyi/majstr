@@ -47,6 +47,16 @@ export class MastersComponent implements OnInit {
     this.loadMasters();
   }
 
+  resetFilters() {
+    this.selectedCity = '';
+    this.selectedCategory = '';
+    this.loadMasters();
+  }
+
+  hasActiveFilters(): boolean {
+    return !!this.selectedCity || !!this.selectedCategory;
+  }
+
   getInitials(m: PublicMaster): string {
     return (m.firstName[0] + m.lastName[0]).toUpperCase();
   }

@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { debounceTime, distinctUntilChanged, Subject, switchMap } from 'rxjs';
 import { ApiService, ServiceCategory } from '../../../core/services/api.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { HelpTooltipComponent } from '../../../shared/components/help-tooltip/help-tooltip.component';
 
 /** Converts a display name to a slug candidate (client-side preview only). */
 function toSlugPreview(value: string): string {
@@ -19,7 +20,7 @@ function toSlugPreview(value: string): string {
 @Component({
   selector: 'app-create-profile',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, HelpTooltipComponent],
   templateUrl: './create-profile.component.html',
   styleUrl: './create-profile.component.scss',
 })

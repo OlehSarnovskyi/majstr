@@ -40,14 +40,23 @@
       }
     </div>
   } @else if (masters().length === 0) {
-    <div class="empty">
-      <span class="material-icons-outlined">group_off</span>
-      <h3>Zatiaľ žiadni majstri</h3>
-      <p class="text-muted">Buďte prvý, kto sa pridá!</p>
-      @if (!auth.isLoggedIn()) {
-        <a routerLink="/auth/register" class="btn btn--primary mt-2">Zaregistrovať sa ako majster</a>
-      }
-    </div>
+    @if (hasActiveFilters()) {
+      <div class="empty-state" style="margin-top: 48px;">
+        <span class="empty-state__icon">🔍</span>
+        <h3 class="empty-state__title">Žiadni majstri nezodpovedajú vašim filtrom</h3>
+        <p class="empty-state__text">Skúste zmeniť filtre alebo vyhľadávací výraz.</p>
+        <button class="btn btn--secondary" (click)="resetFilters()">Resetovať filtre</button>
+      </div>
+    } @else {
+      <div class="empty">
+        <span class="material-icons-outlined">group_off</span>
+        <h3>Zatiaľ žiadni majstri</h3>
+        <p class="text-muted">Buďte prvý, kto sa pridá!</p>
+        @if (!auth.isLoggedIn()) {
+          <a routerLink="/auth/register" class="btn btn--primary mt-2">Zaregistrovať sa ako majster</a>
+        }
+      </div>
+    }
   } @else {
     <div class="grid">
       @for (m of masters(); track m.id) {

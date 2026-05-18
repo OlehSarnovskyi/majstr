@@ -12,7 +12,10 @@
 
       <!-- Slug field -->
       <div class="form-group">
-        <label class="form-label" for="slug">URL adresa profilu</label>
+        <label class="form-label" for="slug">
+          Adresa profilu
+          <app-help-tooltip text="Vaša osobná stránka — funguje ako online vizitka. Zdieľajte ju klientom cez SMS, WhatsApp alebo vytlačte na vizitky."></app-help-tooltip>
+        </label>
 
         <div class="slug-input-wrap">
           <span class="slug-input-wrap__prefix">majster.sk/masters/</span>
@@ -52,17 +55,21 @@
           <span class="material-icons-outlined">link</span>
           <span class="slug-preview__url">{{ previewUrl() }}</span>
         </p>
+        <small class="form-hint">Toto je odkaz na vašu osobnú stránku. Príklad: majster.sk/masters/jan-novak</small>
       </div>
 
       <!-- Description field -->
       <div class="form-group">
-        <label class="form-label" for="description">O sebe <span class="text-muted">(nepovinné)</span></label>
+        <label class="form-label" for="description">
+          O mne <span class="text-muted">(nepovinné)</span>
+          <app-help-tooltip text="Krátky popis o vás. Klienti si tak môžu rozhodnúť, či ste pre nich ten správny majster."></app-help-tooltip>
+        </label>
         <textarea
           id="description"
           class="form-control"
           rows="3"
           maxlength="500"
-          placeholder="Krátky popis vašich skúseností a služieb…"
+          placeholder="Napríklad: Som elektrikár s 15-ročnou praxou. Pracujem v Bratislave a okolí. Špecializujem sa na bytové rekonštrukcie."
           [ngModel]="description()"
           (ngModelChange)="description.set($event)"
         ></textarea>
@@ -72,7 +79,10 @@
       <!-- Category selection -->
       <div class="form-group">
         <div class="cat-header">
-          <span class="form-label">Vaša špecializácia</span>
+          <span class="form-label">
+            Vaša špecializácia (vyberte 1 až 3)
+            <app-help-tooltip text="Vyberte oblasti, v ktorých sa najlepšie vyznáte. Maximálne 3 kategórie."></app-help-tooltip>
+          </span>
           <span class="cat-counter" [class.cat-counter--full]="selectedCount() >= 3">
             Vybrané: {{ selectedCount() }}/3
           </span>
