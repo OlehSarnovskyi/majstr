@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { RouterModule, RouterLinkActive } from '@angular/router';
 import { AdminAuthService } from '../core/services/admin-auth.service';
 
@@ -7,11 +7,27 @@ import { AdminAuthService } from '../core/services/admin-auth.service';
   standalone: true,
   imports: [RouterModule, RouterLinkActive],
   template: `
+    <!-- Mobile top bar -->
+    <header class="mobile-topbar">
+      <button class="hamburger" (click)="toggleSidebar()" [class.is-open]="sidebarOpen()" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <span class="mobile-topbar__title">🔧 Majster Admin</span>
+    </header>
+
+    <!-- Backdrop -->
+    @if (sidebarOpen()) {
+      <div class="sidebar-backdrop" (click)="closeSidebar()"></div>
+    }
+
     <div class="admin-layout">
-      <aside class="sidebar">
+      <aside class="sidebar" [class.is-open]="sidebarOpen()">
         <div class="sidebar__brand">
           <h2>🔧 Majster Admin</h2>
           <span>admin.majster.sk</span>
+          <button class="sidebar__close" (click)="closeSidebar()" aria-label="Close menu">✕</button>
         </div>
 
         <nav class="sidebar__nav">
@@ -22,27 +38,28 @@ import { AdminAuthService } from '../core/services/admin-auth.service';
             routerLinkActive="active"
             [routerLinkActiveOptions]="{ exact: true }"
             class="sidebar__link"
+            (click)="closeSidebar()"
           >
             <span class="nav-icon">📊</span>
             Dashboard
           </a>
 
-          <a routerLink="/users" routerLinkActive="active" class="sidebar__link">
+          <a routerLink="/users" routerLinkActive="active" class="sidebar__link" (click)="closeSidebar()">
             <span class="nav-icon">👥</span>
             Users
           </a>
 
-          <a routerLink="/bookings" routerLinkActive="active" class="sidebar__link">
+          <a routerLink="/bookings" routerLinkActive="active" class="sidebar__link" (click)="closeSidebar()">
             <span class="nav-icon">📅</span>
             Bookings
           </a>
 
-          <a routerLink="/reviews" routerLinkActive="active" class="sidebar__link">
+          <a routerLink="/reviews" routerLinkActive="active" class="sidebar__link" (click)="closeSidebar()">
             <span class="nav-icon">⭐</span>
             Reviews
           </a>
 
-          <a routerLink="/categories" routerLinkActive="active" class="sidebar__link">
+          <a routerLink="/categories" routerLinkActive="active" class="sidebar__link" (click)="closeSidebar()">
             <span class="nav-icon">🗂️</span>
             Categories
           </a>
@@ -71,6 +88,15 @@ export class LayoutComponent {
   private authService = inject(AdminAuthService);
 
   user = this.authService.currentUser;
+  sidebarOpen = signal(false);
+
+  toggleSidebar(): void {
+    this.sidebarOpen.update(v => !v);
+  }
+
+  closeSidebar(): void {
+    this.sidebarOpen.set(false);
+  }
 
   logout(): void {
     this.authService.logout();
