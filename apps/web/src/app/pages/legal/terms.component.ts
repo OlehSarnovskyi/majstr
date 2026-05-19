@@ -14,9 +14,9 @@ import { SeoService } from '../../core/services/seo.service';
       <h2>1. Prevádzkovateľ platformy</h2>
       <p>
         Platformu Majster.sk prevádzkuje:<br/>
-        [DOPLNIŤ: Meno a priezvisko]<br/>
-        Adresa: [DOPLNIŤ: Ulica, PSČ, Mesto, Slovenská republika]<br/>
-        IČO: [DOPLNIŤ: IČO alebo "Fyzická osoba — nepodnikateľ"]<br/>
+        Oleh Sarnovskyi<br/>
+        Adresa: Tovarenska 12, 811 09, Bratislava, Slovenská republika<br/>
+        Právna forma: Fyzická osoba — nepodnikateľ<br/>
         E-mail: <a href="mailto:oleg.sarnovskiy.98&#64;gmail.com">oleg.sarnovskiy.98&#64;gmail.com</a>
       </p>
 
