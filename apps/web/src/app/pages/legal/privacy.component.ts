@@ -22,13 +22,13 @@ import { SeoService } from '../../core/services/seo.service';
       <p>Vaše údaje uchovávame po dobu existencie vášho účtu. Po vymazaní účtu budú vaše osobné údaje odstránené do 30 dní.</p>
 
       <h2>5. Vaše práva (GDPR)</h2>
-      <p>Máte právo na: prístup k svojim údajom, opravu údajov, vymazanie účtu, prenosnosť údajov, obmedzenie spracovania. Pre uplatnenie svojich práv nás kontaktujte na info&#64;majster.sk.</p>
+      <p>Máte právo na: prístup k svojim údajom, opravu údajov, vymazanie účtu, prenosnosť údajov, obmedzenie spracovania. Pre uplatnenie svojich práv nás kontaktujte na oleg.sarnovskiy.98&#64;gmail.com.</p>
 
       <h2>6. Cookies</h2>
       <p>Používame len nevyhnutné technické cookies (autentifikačný token) potrebné pre fungovanie platformy. Nepoužívame sledovacie ani reklamné cookies.</p>
 
       <h2>7. Kontakt</h2>
-      <p>Prevádzkovateľ: Majster.sk<br/>E-mail: info&#64;majster.sk</p>
+      <p>Prevádzkovateľ: Majster.sk<br/>E-mail: oleg.sarnovskiy.98&#64;gmail.com</p>
     </div>
   `,
   styles: [`

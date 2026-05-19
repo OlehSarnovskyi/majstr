@@ -30,7 +30,7 @@ import { SeoService } from '../../core/services/seo.service';
       <p>Účet môžete kedykoľvek zrušiť. Po zrušení budú vaše údaje vymazané v súlade so Zásadami ochrany súkromia.</p>
 
       <h2>7. Kontakt</h2>
-      <p>E-mail: info&#64;majster.sk</p>
+      <p>E-mail: oleg.sarnovskiy.98&#64;gmail.com</p>
     </div>
   `,
   styles: [`

@@ -59,7 +59,7 @@ import { SeoService } from '../../core/services/seo.service';
       <h2>4. Kontakt</h2>
       <p>
         Ak máte otázky ohľadom cookies, kontaktujte nás na
-        <a href="mailto:info&#64;majster.sk">info&#64;majster.sk</a>.
+        <a href="mailto:oleg.sarnovskiy.98&#64;gmail.com">oleg.sarnovskiy.98&#64;gmail.com</a>.
       </p>
     </div>
   `,
