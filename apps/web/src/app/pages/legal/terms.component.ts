@@ -16,7 +16,6 @@ import { SeoService } from '../../core/services/seo.service';
         Platformu Majster.sk prevádzkuje:<br/>
         Oleh Sarnovskyi<br/>
         Adresa: Tovarenska 12, 811 09, Bratislava, Slovenská republika<br/>
-        Právna forma: Fyzická osoba — nepodnikateľ<br/>
         E-mail: <a href="mailto:oleg.sarnovskiy.98&#64;gmail.com">oleg.sarnovskiy.98&#64;gmail.com</a>
       </p>
 
