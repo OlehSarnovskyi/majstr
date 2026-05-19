@@ -19,12 +19,34 @@ import { SeoService } from '../../core/services/seo.service';
 
       <h3>2.1 Nevyhnutné cookies</h3>
       <p>Tieto cookies sú potrebné na základné fungovanie stránky. Bez nich by stránka nefungovala správne.</p>
+      <p>
+        <strong>Poznámka:</strong> Naša platforma využíva
+        <strong>localStorage</strong> prehliadača (nie cookies)
+        na uloženie autentifikačného tokenu. LocalStorage nie je
+        cookie, ale plní podobnú funkciu — uchováva váš prihlasovací stav.
+        Tieto údaje sa vzdialene nezdieľajú a zostávajú len vo vašom prehliadači.
+      </p>
       <table>
         <thead>
           <tr><th>Názov</th><th>Účel</th><th>Platnosť</th></tr>
         </thead>
         <tbody>
-          <tr><td>accessToken</td><td>Prihlásenie používateľa (JWT token v localStorage)</td><td>24 hodín</td></tr>
+          <tr>
+            <td>accessToken</td>
+            <td>
+              JWT autentifikačný token uložený v <strong>localStorage</strong>
+              (nie cookie). Používa sa na overenie identity prihláseného používateľa.
+            </td>
+            <td>24 hodín</td>
+          </tr>
+          <tr>
+            <td>refreshToken</td>
+            <td>
+              Token na obnovenie prihlásenia (ak je implementovaný),
+              uložený v <strong>localStorage</strong>.
+            </td>
+            <td>7 dní (ak je implementovaný)</td>
+          </tr>
           <tr><td>cookie_consent</td><td>Uloženie vášho rozhodnutia o cookies</td><td>Trvalé</td></tr>
         </tbody>
       </table>
