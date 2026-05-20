@@ -1,37 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://majster-sk.vercel.app/</loc>
+    <loc>https://majstr.app/</loc>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://majster-sk.vercel.app/categories</loc>
+    <loc>https://majstr.app/categories</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://majster-sk.vercel.app/masters</loc>
+    <loc>https://majstr.app/masters</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://majster-sk.vercel.app/auth/login</loc>
+    <loc>https://majstr.app/auth/login</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://majster-sk.vercel.app/auth/register</loc>
+    <loc>https://majstr.app/auth/register</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://majster-sk.vercel.app/terms</loc>
+    <loc>https://majstr.app/terms</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://majster-sk.vercel.app/privacy</loc>
+    <loc>https://majstr.app/privacy</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
