@@ -1,6 +1,6 @@
 # Majstr — Manuálny testovací checklist
 
-> Testovacia URL: https://majster.onrender.com
+> Testovacia URL: https://majstr.app
 > Dátum testu: ___________
 > Tester: ___________
 
