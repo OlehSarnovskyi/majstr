@@ -14,7 +14,7 @@ import { AdminAuthService } from '../core/services/admin-auth.service';
         <span></span>
         <span></span>
       </button>
-      <span class="mobile-topbar__title">🔧 Majster Admin</span>
+      <span class="mobile-topbar__title">🔧 Majstr Admin</span>
     </header>
 
     <!-- Backdrop -->
@@ -25,8 +25,8 @@ import { AdminAuthService } from '../core/services/admin-auth.service';
     <div class="admin-layout">
       <aside class="sidebar" [class.is-open]="sidebarOpen()">
         <div class="sidebar__brand">
-          <h2>🔧 Majster Admin</h2>
-          <span>admin.majster.sk</span>
+          <h2>🔧 Majstr Admin</h2>
+          <span>admin.majstr.app</span>
           <button class="sidebar__close" (click)="closeSidebar()" aria-label="Close menu">✕</button>
         </div>
 

@@ -25,7 +25,7 @@ export class CategoryDetailComponent implements OnInit {
       next: (cat) => {
         this.category.set(cat);
         this.loading.set(false);
-        this.seo.setPage(cat.name, `Nájdite služby a profesionálov v kategórii ${cat.name} na Majster.sk`);
+        this.seo.setPage(cat.name, `Nájdite služby a profesionálov v kategórii ${cat.name} na Majstr`);
       },
       error: () => this.loading.set(false),
     });

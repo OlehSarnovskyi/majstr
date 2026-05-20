@@ -80,7 +80,7 @@ Dátum a čas: ${dateStr}
 ${ctaText}
 
 S pozdravom,
-Tím Majster.sk`;
+Tím Majstr`;
 
   return { subject, html, text };
 }

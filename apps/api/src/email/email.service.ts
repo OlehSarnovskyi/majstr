@@ -7,18 +7,18 @@ import { renderBookingCompletedClient } from './templates/booking-completed-clie
 import { renderWelcomeMaster } from './templates/welcome-master';
 import { renderWelcomeClient } from './templates/welcome-client';
 
-const FRONTEND_URL = process.env['FRONTEND_URL'] || 'https://majster-sk.vercel.app';
+const FRONTEND_URL = process.env['FRONTEND_URL'] || 'https://majstr.app';
 
 @Injectable()
 export class EmailService {
   private readonly logger = new Logger(EmailService.name);
   private readonly client: BrevoClient | null = null;
   private readonly senderEmail: string;
-  private readonly senderName = 'Majster.sk';
+  private readonly senderName = 'Majstr';
 
   constructor() {
     const apiKey = process.env['BREVO_API_KEY'];
-    this.senderEmail = process.env['BREVO_SENDER_EMAIL'] || 'noreply@majster.sk';
+    this.senderEmail = process.env['BREVO_SENDER_EMAIL'] || 'noreply@majstr.app';
 
     if (apiKey) {
       this.client = new BrevoClient({ apiKey });
@@ -141,8 +141,8 @@ export class EmailService {
     const resetUrl = `${frontendUrl}/auth/reset-password?token=${token}`;
     await this.sendMail(
       to,
-      'Obnovenie hesla — Majster.sk',
-      `Dobrý deň ${firstName},\n\nPožiadali ste o obnovenie hesla. Kliknite na odkaz nižšie pre nastavenie nového hesla:\n\n${resetUrl}\n\nOdkaz je platný 1 hodinu. Ak ste o obnovenie nepožiadali, ignorujte tento email.\n\nMajster.sk`
+      'Obnovenie hesla — Majstr',
+      `Dobrý deň ${firstName},\n\nPožiadali ste o obnovenie hesla. Kliknite na odkaz nižšie pre nastavenie nového hesla:\n\n${resetUrl}\n\nOdkaz je platný 1 hodinu. Ak ste o obnovenie nepožiadali, ignorujte tento email.\n\nMajstr`
     );
   }
 
@@ -150,16 +150,16 @@ export class EmailService {
     const frontendUrl = process.env['FRONTEND_URL'] || 'http://localhost:4200';
     await this.sendMail(
       to,
-      'Vitajte na Majster.sk! 🎉',
-      `Dobrý deň ${firstName},\n\nVitajte na Majster.sk!\n\nVáš účet bol úspešne vytvorený cez Google. Môžete sa kedykoľvek prihlásiť pomocou tlačidla "Prihlásiť sa cez Google".\n\nČo môžete robiť:\n• Prehliadať majstrov a ich služby\n• Rezervovať termíny online\n• Sledovať stav vašich rezervácií\n\nZačnite hľadať: ${frontendUrl}/services\n\nMajster.sk — majster na všetky ruky`
+      'Vitajte na Majstr! 🎉',
+      `Dobrý deň ${firstName},\n\nVitajte na Majstr!\n\nVáš účet bol úspešne vytvorený cez Google. Môžete sa kedykoľvek prihlásiť pomocou tlačidla "Prihlásiť sa cez Google".\n\nČo môžete robiť:\n• Prehliadať majstrov a ich služby\n• Rezervovať termíny online\n• Sledovať stav vašich rezervácií\n\nZačnite hľadať: ${frontendUrl}/services\n\nMajstr`
     );
   }
 
   async sendTestEmail(to: string) {
     await this.sendMail(
       to,
-      '✅ Test email — Majster.sk Brevo works!',
-      `Tento email bol odoslaný z produkčného servera Majster.sk.\n\nBrevo konfigurácia funguje správne!\n\nČas odoslania: ${new Date().toISOString()}\n\nMajster.sk`
+      '✅ Test email — Majstr Brevo works!',
+      `Tento email bol odoslaný z produkčného servera Majstr.\n\nBrevo konfigurácia funguje správne!\n\nČas odoslania: ${new Date().toISOString()}\n\nMajstr`
     );
   }
 
@@ -168,8 +168,8 @@ export class EmailService {
     const verifyUrl = `${frontendUrl}/auth/verify-email?token=${token}`;
     await this.sendMail(
       to,
-      'Overte váš email — Majster.sk',
-      `Dobrý deň ${firstName},\n\nProsím overte vašu emailovú adresu kliknutím na odkaz nižšie:\n\n${verifyUrl}\n\nMajster.sk`
+      'Overte váš email — Majstr',
+      `Dobrý deň ${firstName},\n\nProsím overte vašu emailovú adresu kliknutím na odkaz nižšie:\n\n${verifyUrl}\n\nMajstr`
     );
   }
 

@@ -10,7 +10,7 @@ import { ActivatedRoute } from '@angular/router';
       <div class="login-card">
         <div class="login-card__logo">
           <span class="login-card__icon">🔧</span>
-          <h1>Majster Admin</h1>
+          <h1>Majstr Admin</h1>
           <p class="login-card__subtitle">Sign in with your Google account to continue</p>
         </div>
 

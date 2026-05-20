@@ -37,7 +37,7 @@ export class MasterProfileComponent implements OnInit {
         this.loading.set(false);
         this.seo.setPage(
           `${p.user.firstName} ${p.user.lastName}`,
-          `${p.user.firstName} ${p.user.lastName} — profesionálny majster na Majster.sk. ${p.user.services?.length || 0} dostupných služieb.`
+          `${p.user.firstName} ${p.user.lastName} — profesionálny majster na Majstr. ${p.user.services?.length || 0} dostupných služieb.`
         );
         // Load reviews separately after profile resolves (slug is confirmed)
         this.loadReviews(p.slug);

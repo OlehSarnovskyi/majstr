@@ -12,12 +12,12 @@ export function renderWelcomeMaster(data: WelcomeMasterData): { subject: string;
   const profileUrl = `${frontendUrl}/masters/${slug}`;
   const dashboardUrl = `${frontendUrl}/dashboard`;
 
-  const subject = `Vitajte na Majster.sk! Váš profil je pripravený`;
+  const subject = `Vitajte na Majstr! Váš profil je pripravený`;
 
   const html = baseLayout(`
     ${greeting(user.firstName)}
     <p style="font-size:16px;color:#1E293B;font-family:Arial,Helvetica,sans-serif;margin:0 0 16px 0;">
-      Vitajte na <strong style="color:#0D9488;">Majster.sk</strong>! Váš majsterský profil bol úspešne vytvorený.
+      Vitajte na <strong style="color:#0D9488;">Majstr</strong>! Váš majsterský profil bol úspešne vytvorený.
     </p>
     <p style="font-size:15px;color:#475569;font-family:Arial,Helvetica,sans-serif;margin:0 0 20px 0;">
       Zákazníci vás teraz môžu nájsť a rezervovať vaše služby online. Tu je niekoľko tipov na začiatok:
@@ -49,11 +49,11 @@ export function renderWelcomeMaster(data: WelcomeMasterData): { subject: string;
     </p>
     ${ctaButton('Otvoriť dashboard', dashboardUrl)}
     ${signOff(frontendUrl)}
-  `, `Váš majsterský profil na Majster.sk je aktívny`);
+  `, `Váš majsterský profil na Majstr je aktívny`);
 
   const text = `Dobrý deň, ${user.firstName},
 
-Vitajte na Majster.sk! Váš majsterský profil bol úspešne vytvorený.
+Vitajte na Majstr! Váš majsterský profil bol úspešne vytvorený.
 
 Zákazníci vás teraz môžu nájsť a rezervovať vaše služby online.
 
@@ -68,7 +68,7 @@ Váš verejný profil: ${profileUrl}
 Otvoriť dashboard: ${dashboardUrl}
 
 S pozdravom,
-Tím Majster.sk`;
+Tím Majstr`;
 
   return { subject, html, text };
 }

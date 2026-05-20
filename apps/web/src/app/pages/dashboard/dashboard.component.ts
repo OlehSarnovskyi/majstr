@@ -298,13 +298,13 @@ export class DashboardComponent implements OnInit {
     const ics = [
       'BEGIN:VCALENDAR',
       'VERSION:2.0',
-      'PRODID:-//Majster.sk//SK',
+      'PRODID:-//Majstr//SK',
       'BEGIN:VEVENT',
       `DTSTART:${fmt(start)}`,
       `DTEND:${fmt(end)}`,
       `SUMMARY:${escapeIcs(serviceName)}`,
       b.note ? `DESCRIPTION:${escapeIcs(b.note)}` : '',
-      `UID:${b.id}@majster.sk`,
+      `UID:${b.id}@majstr.app`,
       'END:VEVENT',
       'END:VCALENDAR',
     ].filter(Boolean).join('\r\n');

@@ -26,7 +26,7 @@ export class MastersComponent implements OnInit {
   private seo = inject(SeoService);
 
   ngOnInit() {
-    this.seo.setPage('Majstri', 'Prehliadajte overených remeselníkov a profesionálov na Majster.sk');
+    this.seo.setPage('Majstri', 'Prehliadajte overených remeselníkov a profesionálov na Majstr');
     this.api.getCities().subscribe((c) => this.cities.set(c));
     this.api.getCategories().subscribe((c) => this.categories.set(c));
     this.loadMasters();

@@ -47,7 +47,7 @@ export class CreateProfileComponent implements OnInit {
 
   /** Live preview URL shown below the input */
   readonly previewUrl = computed(
-    () => `majster.sk/masters/${this.slug() || '...'}`
+    () => `majstr.app/masters/${this.slug() || '...'}`
   );
 
   readonly slugError = computed(() => {

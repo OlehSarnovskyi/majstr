@@ -13,7 +13,7 @@ import { SeoService } from '../../core/services/seo.service';
 
       <h2>1. Prevádzkovateľ platformy</h2>
       <p>
-        Platformu Majster.sk prevádzkuje:<br/>
+        Platformu Majstr prevádzkuje:<br/>
         Oleh Sarnovskyi<br/>
         Adresa: Tovarenska 12, 811 09, Bratislava, Slovenská republika<br/>
         E-mail: <a href="mailto:oleg.sarnovskiy.98&#64;gmail.com">oleg.sarnovskiy.98&#64;gmail.com</a>
@@ -21,7 +21,7 @@ import { SeoService } from '../../core/services/seo.service';
 
       <h2>2. Úvod</h2>
       <p>
-        Tieto podmienky upravujú používanie platformy Majster.sk.
+        Tieto podmienky upravujú používanie platformy Majstr.
         Registráciou alebo používaním platformy súhlasíte s týmito podmienkami.
       </p>
 
@@ -36,7 +36,7 @@ import { SeoService } from '../../core/services/seo.service';
       <p>
         Klienti môžu bezplatne prehliadať služby a vytvárať rezervácie.
         Platba za služby prebieha priamo medzi klientom a majstrom —
-        Majster.sk nesprostredkúva platby ani nie je stranou platobnej transakcie.
+        Majstr nesprostredkúva platby ani nie je stranou platobnej transakcie.
       </p>
 
       <h2>5. Pre majstrov</h2>
@@ -50,11 +50,11 @@ import { SeoService } from '../../core/services/seo.service';
 
       <h2>6. Charakter platformy a obmedzenie zodpovednosti</h2>
       <p>
-        Majster.sk je výlučne sprostredkovateľská platforma, ktorá spája klientov
+        Majstr je výlučne sprostredkovateľská platforma, ktorá spája klientov
         s nezávislými poskytovateľmi služieb (majstrami).
-        Majster.sk nie je zmluvnou stranou dohody medzi klientom a majstrom.
+        Majstr nie je zmluvnou stranou dohody medzi klientom a majstrom.
       </p>
-      <p>Majster.sk nenesie zodpovednosť za:</p>
+      <p>Majstr nenesie zodpovednosť za:</p>
       <ul>
         <li>kvalitu, bezpečnosť ani výsledok poskytnutých služieb</li>
         <li>škody na majetku alebo zdraví vzniknuté v súvislosti s poskytnutými službami</li>
@@ -65,21 +65,21 @@ import { SeoService } from '../../core/services/seo.service';
       </ul>
       <p>
         Majstri sú nezávislými podnikateľmi (živnostníkmi alebo s.r.o.),
-        nie zamestnancami ani zástupcami platformy Majster.sk.
+        nie zamestnancami ani zástupcami platformy Majstr.
       </p>
 
       <h2>7. Zrušenie rezervácií</h2>
       <p>
         Klient aj majster môžu zrušiť rezerváciu prostredníctvom platformy.
         Podmienky storna a prípadná kompenzácia sú vecou dohody medzi klientom a majstrom —
-        Majster.sk do tohto vzťahu nevstupuje.
+        Majstr do tohto vzťahu nevstupuje.
       </p>
 
       <h2>8. Hodnotenia a recenzie</h2>
       <p>
         Klienti môžu hodnotiť majstrov po dokončení rezervácie.
         Hodnotenia musia byť pravdivé a nesmú obsahovať urážlivý obsah.
-        Majster.sk si vyhradzuje právo odstrániť hodnotenia porušujúce tieto zásady.
+        Majstr si vyhradzuje právo odstrániť hodnotenia porušujúce tieto zásady.
       </p>
 
       <h2>9. Zrušenie účtu</h2>
@@ -89,17 +89,17 @@ import { SeoService } from '../../core/services/seo.service';
         Po zrušení budú vaše údaje vymazané v súlade so
         <a routerLink="/privacy">Zásadami ochrany súkromia</a>.
       </p>
-      <p>Majster.sk si vyhradzuje právo zablokovať alebo zrušiť účet, ktorý porušuje tieto podmienky.</p>
+      <p>Majstr si vyhradzuje právo zablokovať alebo zrušiť účet, ktorý porušuje tieto podmienky.</p>
 
       <h2>10. Duševné vlastníctvo</h2>
       <p>
-        Platforma Majster.sk, jej dizajn, kód a obsah sú duševným vlastníctvom prevádzkovateľa.
+        Platforma Majstr, jej dizajn, kód a obsah sú duševným vlastníctvom prevádzkovateľa.
         Obsah platformy nesmie byť kopírovaný, distribuovaný ani upravovaný bez písomného súhlasu.
       </p>
 
       <h2>11. Zmeny podmienok</h2>
       <p>
-        Majster.sk si vyhradzuje právo kedykoľvek zmeniť tieto podmienky.
+        Majstr si vyhradzuje právo kedykoľvek zmeniť tieto podmienky.
         O podstatných zmenách vás budeme informovať e-mailom aspoň 14 dní pred nadobudnutím účinnosti zmien.
         Pokračovaním v používaní platformy po nadobudnutí účinnosti zmien
         vyjadrujete súhlas s novými podmienkami.

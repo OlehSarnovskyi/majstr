@@ -82,10 +82,10 @@ describe('generateSlug()', () => {
     expect(result.length).toBeGreaterThanOrEqual(2);
   });
 
-  it('falls back to "majster" when name produces empty slug', () => {
+  it('falls back to "majstr" when name produces empty slug', () => {
     // Name made entirely of unsupported chars
     const result = generateSlug('!!!', '???', []);
-    expect(result).toBe('majster');
+    expect(result).toBe('majstr');
   });
 
   it('does not duplicate existing slugs across many masters', () => {

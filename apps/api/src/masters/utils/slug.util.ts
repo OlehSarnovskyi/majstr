@@ -70,7 +70,7 @@ export function generateSlug(
   const base = toSlugBase(`${firstName} ${lastName}`);
 
   // Fallback: if name produces an empty slug (edge case), use random
-  const safeBase = base || 'majster';
+  const safeBase = base || 'majstr';
 
   if (!taken.has(safeBase)) return safeBase;
 

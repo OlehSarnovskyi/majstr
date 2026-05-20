@@ -61,7 +61,7 @@ Dátum: ${dateStr}
 Ohodnotiť majstra: ${reviewUrl}
 
 S pozdravom,
-Tím Majster.sk`;
+Tím Majstr`;
 
   return { subject, html, text };
 }
