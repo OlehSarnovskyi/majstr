@@ -1,4 +1,4 @@
-# Majster.sk
+# Majstr
 
 A platform for finding and booking craftsman services in Slovakia.
 
@@ -21,8 +21,8 @@ prisma/
 ### 1. Clone and install dependencies
 
 ```bash
-git clone https://github.com/OlehSarnovskyi/majster.git
-cd majster
+git clone https://github.com/OlehSarnovskyi/majstr.git
+cd majstr
 npm install
 ```
 

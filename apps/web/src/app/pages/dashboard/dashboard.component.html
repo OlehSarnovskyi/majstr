@@ -383,7 +383,7 @@
   @if (showWelcomeModal()) {
     <div class="modal-overlay" (click)="closeWelcomeModal()">
       <div class="modal-box" (click)="$event.stopPropagation()">
-        <h2 class="modal-box__title">Vitajte v Majster.sk! 🎉</h2>
+        <h2 class="modal-box__title">Vitajte v Majstr! 🎉</h2>
         <p class="modal-box__subtitle text-muted">Váš profil je aktívny. Tu sú 3 kroky, ako začať:</p>
         <ol class="modal-box__steps">
           <li>1️⃣ <strong>Pridajte vaše služby</strong> s cenami</li>
@@ -418,7 +418,7 @@
               </span>
               <div class="profile-url-row__value">
                 <a [href]="'/masters/' + p.slug" class="profile-url-row__link" target="_blank">
-                  majster.sk/masters/{{ p.slug }}
+                  majstr.app/masters/{{ p.slug }}
                 </a>
                 <button
                   class="btn btn--ghost btn--sm profile-url-row__copy"

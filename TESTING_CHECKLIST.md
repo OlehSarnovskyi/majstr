@@ -1,4 +1,4 @@
-# Majster.sk — Manuálny testovací checklist
+# Majstr — Manuálny testovací checklist
 
 > Testovacia URL: https://majster.onrender.com
 > Dátum testu: ___________
@@ -12,7 +12,7 @@
 - [ ] Zadať meno, priezvisko, email (`+test` alias), heslo (min. 8 znakov)
 - [ ] Kliknúť **Zaregistrovať sa**
 - [ ] Skontrolovať: presmerovanie na dashboard alebo výber roly
-- [ ] Skontrolovať: e-mail **"Overte váš email — Majster.sk"** prišiel do schránky
+- [ ] Skontrolovať: e-mail **"Overte váš email — Majstr"** prišiel do schránky
 - [ ] Kliknúť na odkaz v e-maile
 - [ ] Skontrolovať: stránka `/auth/verify-email` zobrazí **"Váš e-mail bol úspešne overený!"**
 - [ ] Kliknúť **Prihlásiť sa** → správny presun na login
@@ -27,7 +27,7 @@
 - [ ] Skontrolovať: presmerovanie na `/auth/choose-role` (pre nového používateľa)
 - [ ] Vybrať rolu (Klient alebo Majster)
 - [ ] Skontrolovať: presmerovanie na dashboard
-- [ ] Skontrolovať: privítací e-mail **"Vitajte na Majster.sk! 🎉"** prišiel do schránky
+- [ ] Skontrolovať: privítací e-mail **"Vitajte na Majstr! 🎉"** prišiel do schránky
 
 ---
 
@@ -52,7 +52,7 @@
 - [ ] Zadať email **existujúceho email+heslo účtu**
 - [ ] Kliknúť **Nadoslať posielanie**
 - [ ] Skontrolovať: správa **"Ak tento e-mail existuje, bol naň odoslaný odkaz..."**
-- [ ] Skontrolovať: e-mail **"Obnovenie hesla — Majster.sk"** prišiel do schránky
+- [ ] Skontrolovať: e-mail **"Obnovenie hesla — Majstr"** prišiel do schránky
 - [ ] Kliknúť na odkaz v e-maile → otvorí sa `/auth/reset-password?token=...`
 - [ ] Zadať nové heslo (min. 8 znakov) → kliknúť **Obnoviť heslo**
 - [ ] Skontrolovať: správa o úspešnom obnovení + presmerovanie na login za 3 sekundy
@@ -157,9 +157,9 @@
 
 | Udalosť | Príjemca | Predmet |
 |---|---|---|
-| Registrácia email+heslo | Klient | Overte váš email — Majster.sk |
-| Registrácia cez Google | Klient | Vitajte na Majster.sk! 🎉 |
-| Zabudnuté heslo | Klient | Obnovenie hesla — Majster.sk |
+| Registrácia email+heslo | Klient | Overte váš email — Majstr |
+| Registrácia cez Google | Klient | Vitajte na Majstr! 🎉 |
+| Zabudnuté heslo | Klient | Obnovenie hesla — Majstr |
 | Nová rezervácia | Majster | Nová rezervácia: [Služba] |
 | Nová rezervácia | Klient | Rezervácia prijatá: [Služba] |
 | Potvrdenie rezervácie | Klient | Rezervácia potvrdená: [Služba] |

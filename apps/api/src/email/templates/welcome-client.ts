@@ -10,15 +10,15 @@ export function renderWelcomeClient(data: WelcomeClientData): { subject: string;
   const { user, frontendUrl } = data;
   const servicesUrl = `${frontendUrl}/services`;
 
-  const subject = `Vitajte na Majster.sk! 🎉`;
+  const subject = `Vitajte na Majstr! 🎉`;
 
   const html = baseLayout(`
     ${greeting(user.firstName)}
     <p style="font-size:16px;color:#1E293B;font-family:Arial,Helvetica,sans-serif;margin:0 0 16px 0;">
-      Vitajte na <strong style="color:#0D9488;">Majster.sk</strong>! Váš účet bol úspešne vytvorený.
+      Vitajte na <strong style="color:#0D9488;">Majstr</strong>! Váš účet bol úspešne vytvorený.
     </p>
     <p style="font-size:15px;color:#475569;font-family:Arial,Helvetica,sans-serif;margin:0 0 20px 0;">
-      Na Majster.sk môžete rýchlo a jednoducho nájsť a rezervovať overených remeselníkov vo vašom okolí.
+      Na Majstr môžete rýchlo a jednoducho nájsť a rezervovať overených remeselníkov vo vašom okolí.
     </p>
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin:16px 0;">
       <tr>
@@ -37,13 +37,13 @@ export function renderWelcomeClient(data: WelcomeClientData): { subject: string;
     </table>
     ${ctaButton('Začať hľadať majstra', servicesUrl)}
     ${signOff(frontendUrl)}
-  `, `Začnite hľadať skvelých remeselníkov na Majster.sk`);
+  `, `Začnite hľadať skvelých remeselníkov na Majstr`);
 
   const text = `Dobrý deň, ${user.firstName},
 
-Vitajte na Majster.sk! Váš účet bol úspešne vytvorený.
+Vitajte na Majstr! Váš účet bol úspešne vytvorený.
 
-Na Majster.sk môžete rýchlo a jednoducho nájsť a rezervovať overených remeselníkov vo vašom okolí.
+Na Majstr môžete rýchlo a jednoducho nájsť a rezervovať overených remeselníkov vo vašom okolí.
 
 Čo môžete robiť:
 - Prehliadajte majstrov podľa kategórie a mesta
@@ -53,7 +53,7 @@ Na Majster.sk môžete rýchlo a jednoducho nájsť a rezervovať overených rem
 Začať hľadať majstra: ${servicesUrl}
 
 S pozdravom,
-Tím Majster.sk`;
+Tím Majstr`;
 
   return { subject, html, text };
 }

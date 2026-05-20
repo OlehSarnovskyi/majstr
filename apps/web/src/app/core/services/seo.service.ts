@@ -3,7 +3,7 @@ import { Title, Meta } from '@angular/platform-browser';
 
 @Injectable({ providedIn: 'root' })
 export class SeoService {
-  private siteName = 'Majster.sk';
+  private siteName = 'Majstr';
 
   private title = inject(Title);
   private meta = inject(Meta);

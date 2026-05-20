@@ -1,5 +1,5 @@
 /**
- * Base HTML email layout for Majster.sk
+ * Base HTML email layout for Majstr
  * Table-based for maximum email client compatibility.
  */
 export function baseLayout(content: string, preheader?: string): string {
@@ -13,7 +13,7 @@ export function baseLayout(content: string, preheader?: string): string {
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Majster.sk</title>
+  <title>Majstr</title>
   <style>
     body { margin: 0; padding: 0; background-color: #F1F5F9; font-family: Arial, Helvetica, sans-serif; }
     table { border-collapse: collapse; }
@@ -46,7 +46,7 @@ export function baseLayout(content: string, preheader?: string): string {
           <!-- HEADER -->
           <tr>
             <td class="header" style="background-color:#0D9488;padding:24px 32px;text-align:center;">
-              <p class="header-title" style="color:#FFFFFF;font-size:22px;font-weight:bold;margin:0;font-family:Arial,Helvetica,sans-serif;">&#128295; Majster.sk</p>
+              <p class="header-title" style="color:#FFFFFF;font-size:22px;font-weight:bold;margin:0;font-family:Arial,Helvetica,sans-serif;">&#128295; Majstr</p>
             </td>
           </tr>
 
@@ -61,7 +61,7 @@ export function baseLayout(content: string, preheader?: string): string {
           <tr>
             <td class="footer" style="background-color:#F8FAFC;padding:20px 32px;text-align:center;border-top:1px solid #E2E8F0;">
               <p class="footer-text" style="color:#94A3B8;font-size:12px;line-height:1.6;margin:0;">
-                Majster.sk &mdash; platforma pre slovenských remeselníkov<br/>
+                Majstr &mdash; platforma pre slovenských remeselníkov<br/>
                 <span style="font-size:11px;">Ak si neželáte dostávať tieto emaily, odporúčame vám spravovať nastavenia vo vašom profile.</span>
               </p>
             </td>

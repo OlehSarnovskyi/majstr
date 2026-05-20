@@ -57,7 +57,7 @@ Dátum a čas: ${dateStr}${booking.address ? `\nAdresa: ${booking.address}` : ''
 Zobraziť rezerváciu: ${bookingUrl}
 
 S pozdravom,
-Tím Majster.sk`;
+Tím Majstr`;
 
   return { subject, html, text };
 }
