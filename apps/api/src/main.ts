@@ -27,9 +27,12 @@ async function bootstrap() {
   // Cookie parser (needed for OAuth state verification)
   app.use(cookieParser());
 
-  // CORS — frontend is on a separate origin (Vercel)
-  const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:4200';
-  app.enableCors({ origin: frontendUrl, credentials: true });
+  // CORS — supports comma-separated list of allowed origins (for domain migration)
+  // e.g. CORS_ORIGINS=https://majstr.app,https://majster-sk.vercel.app
+  const corsOrigins = process.env.CORS_ORIGINS
+    ? process.env.CORS_ORIGINS.split(',').map(o => o.trim())
+    : [process.env.FRONTEND_URL || 'http://localhost:4200'];
+  app.enableCors({ origin: corsOrigins, credentials: true });
 
   // Serve uploaded files
   app.useStaticAssets(join(process.cwd(), 'uploads'), {
