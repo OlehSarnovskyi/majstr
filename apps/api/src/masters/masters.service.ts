@@ -62,7 +62,10 @@ export class MastersService {
   // ── Public master listing ────────────────────────────────────────────────
 
   async findAll(filters?: { city?: string; category?: string; search?: string }) {
-    const where: Prisma.UserWhereInput = { role: Role.MASTER };
+    const where: Prisma.UserWhereInput = {
+      role: Role.MASTER,
+      services: { some: {} }, // hide masters with no services — nothing to book
+    };
 
     if (filters?.city) {
       const citySlug = filters.city.toLowerCase();
