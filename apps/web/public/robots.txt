@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://majster-sk.vercel.app/sitemap.xml
+Sitemap: https://majstr.app/sitemap.xml
