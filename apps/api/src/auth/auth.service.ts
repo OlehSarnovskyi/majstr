@@ -77,7 +77,7 @@ export class AuthService {
       .catch((err) => this.logger.error('Failed to send verification email', err));
 
     this.emailService
-      .sendWelcomeEmail(user.email, user.firstName)
+      .sendWelcomeClient({ user: { firstName: user.firstName, email: user.email } })
       .catch((err) => this.logger.error('Failed to send welcome email', err));
 
     // No JWT issued — user must verify email and log in
@@ -154,7 +154,7 @@ export class AuthService {
         });
         // Send welcome email async — don't block login if it fails
         this.emailService
-          .sendWelcomeEmail(user.email, user.firstName)
+          .sendWelcomeClient({ user: { firstName: user.firstName, email: user.email } })
           .catch((err) => this.logger.error('Failed to send welcome email', err));
       }
     }

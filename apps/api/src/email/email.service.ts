@@ -6,6 +6,7 @@ import { renderBookingCancelled } from './templates/booking-cancelled';
 import { renderBookingCompletedClient } from './templates/booking-completed-client';
 import { renderWelcomeMaster } from './templates/welcome-master';
 import { renderWelcomeClient } from './templates/welcome-client';
+import { renderEmailVerification } from './templates/email-verification';
 
 const FRONTEND_URL = process.env['FRONTEND_URL'] || 'https://majstr.app';
 
@@ -166,11 +167,12 @@ export class EmailService {
   async sendEmailVerification(to: string, firstName: string, token: string) {
     const frontendUrl = process.env['FRONTEND_URL'] || 'http://localhost:4200';
     const verifyUrl = `${frontendUrl}/auth/verify-email?token=${token}`;
-    await this.sendMail(
-      to,
-      'Overte váš email — Majstr',
-      `Dobrý deň ${firstName},\n\nProsím overte vašu emailovú adresu kliknutím na odkaz nižšie:\n\n${verifyUrl}\n\nMajstr`
-    );
+    const { subject, html, text } = renderEmailVerification({
+      user: { firstName },
+      verifyUrl,
+      frontendUrl,
+    });
+    await this.sendMail(to, subject, text, html);
   }
 
   // ─── Core send ─────────────────────────────────────────────────────────────
