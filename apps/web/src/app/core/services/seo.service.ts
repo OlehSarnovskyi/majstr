@@ -3,7 +3,7 @@ import { Title, Meta } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 
 const BASE_URL = 'https://majstr.app';
-const DEFAULT_IMAGE = `${BASE_URL}/og-image.svg`;
+const DEFAULT_IMAGE = `${BASE_URL}/og-image.png`;
 
 @Injectable({ providedIn: 'root' })
 export class SeoService {
