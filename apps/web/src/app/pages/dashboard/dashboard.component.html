@@ -273,13 +273,17 @@
               <textarea
                 class="form-field__input review-form__textarea"
                 rows="2"
-                placeholder="Voliteľný komentár..."
+                placeholder="Voliteľný komentár (min. 5 znakov)..."
                 [value]="reviewComment()"
                 (input)="reviewComment.set($any($event.target).value)"
                 maxlength="1000"
               ></textarea>
+              @if (reviewComment().trim().length > 0 && reviewComment().trim().length < commentMin) {
+                <span class="form-field__error">Komentár musí mať aspoň {{ commentMin }} znakov</span>
+              }
               <div class="review-form__actions">
-                <button class="btn btn--primary btn--sm" (click)="submitReview(b.id)" [disabled]="submittingReview() || reviewRating() < 1">
+                <button class="btn btn--primary btn--sm" (click)="submitReview(b.id)"
+                  [disabled]="submittingReview() || reviewRating() < 1 || (reviewComment().trim().length > 0 && reviewComment().trim().length < commentMin)">
                   {{ submittingReview() ? 'Odosielam...' : 'Odoslať' }}
                 </button>
                 <button class="btn btn--ghost btn--sm" (click)="cancelReview()" [disabled]="submittingReview()">Zrušiť</button>
