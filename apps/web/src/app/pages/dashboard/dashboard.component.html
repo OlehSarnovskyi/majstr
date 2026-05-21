@@ -138,7 +138,7 @@
       }
 
       @if (confirmedBookings().length > 0) {
-        <h2 class="section-label mt-3">Nadchádzajúce</h2>
+        <h2 class="section-label mt-3">Potvrdené</h2>
         <div class="booking-list">
           @for (b of confirmedBookings(); track b.id) {
             <ng-container *ngTemplateOutlet="bookingCard; context: { $implicit: b }"/>
