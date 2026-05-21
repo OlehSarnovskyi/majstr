@@ -16,6 +16,8 @@ import { ConfirmService } from '../../core/services/confirm.service';
 import { FormsModule } from '@angular/forms';
 import { StarRatingComponent } from '../../shared/components/star-rating/star-rating.component';
 
+const COMMENT_MIN = 5;
+
 const STATUS_SK: Record<string, string> = {
   PENDING: '⏳ Čaká na potvrdenie',
   CONFIRMED: '✓ Potvrdená',
@@ -107,6 +109,8 @@ export class DashboardComponent implements OnInit {
 
   // Review form state (client only, for COMPLETED bookings)
   reviewingBookingId = signal<string | null>(null);
+  readonly commentMin = COMMENT_MIN;
+
   reviewRating = signal<number>(0);
   reviewComment = signal<string>('');
   submittingReview = signal(false);
@@ -468,6 +472,11 @@ export class DashboardComponent implements OnInit {
     const rating = this.reviewRating();
     if (rating < 1 || rating > 5) {
       this.toast.error('Vyberte hodnotenie (1–5 hviezdičiek)');
+      return;
+    }
+    const comment = this.reviewComment().trim();
+    if (comment && comment.length < COMMENT_MIN) {
+      this.toast.error(`Komentár musí mať aspoň ${COMMENT_MIN} znakov`);
       return;
     }
     this.submittingReview.set(true);
