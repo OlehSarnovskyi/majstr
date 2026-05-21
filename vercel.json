@@ -9,6 +9,10 @@
       "destination": "https://p01--majster-api--qsdsbvpywc6x.code.run/api/:path*"
     },
     {
+      "source": "/sitemap.xml",
+      "destination": "https://p01--majster-api--qsdsbvpywc6x.code.run/sitemap.xml"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

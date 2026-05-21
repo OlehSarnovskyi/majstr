@@ -12,6 +12,7 @@ import { BookingsModule } from '../bookings/bookings.module';
 import { MastersModule } from '../masters/masters.module';
 import { ReviewsModule } from '../reviews/reviews.module';
 import { AdminModule } from '../admin/admin.module';
+import { SitemapModule } from '../sitemap/sitemap.module';
 import { OriginMiddleware } from '../common/middleware/origin.middleware';
 import { EmailModule } from '../email/email.module';
 import { SeedModule } from '../seed/seed.module';
@@ -34,6 +35,7 @@ import { DevController } from '../dev/dev.controller';
     MastersModule,
     ReviewsModule,
     AdminModule,
+    SitemapModule,
   ],
   controllers: [AppController, DevController],
   providers: [
@@ -47,6 +49,7 @@ export class AppModule implements NestModule {
       .apply(OriginMiddleware)
       .exclude(
         { path: 'api/auth/google/callback', method: RequestMethod.GET }, // Google redirects back
+        { path: 'sitemap.xml',              method: RequestMethod.GET }, // public, no CORS check
       )
       .forRoutes({ path: '*path', method: RequestMethod.ALL });
   }

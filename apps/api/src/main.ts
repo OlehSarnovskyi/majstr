@@ -1,4 +1,4 @@
-import { Logger, ValidationPipe } from '@nestjs/common';
+import { Logger, RequestMethod, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
@@ -17,7 +17,9 @@ async function bootstrap() {
   }
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const globalPrefix = 'api';
-  app.setGlobalPrefix(globalPrefix);
+  app.setGlobalPrefix(globalPrefix, {
+    exclude: [{ path: 'sitemap.xml', method: RequestMethod.GET }],
+  });
 
   // CSP disabled — Angular SPA requires 'unsafe-inline' for event handlers and
   // external font sources (Material Icons CDN), which defeats XSS protection.

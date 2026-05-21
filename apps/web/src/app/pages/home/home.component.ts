@@ -21,7 +21,23 @@ export class HomeComponent implements OnInit {
   private seo = inject(SeoService);
 
   ngOnInit() {
-    this.seo.setPage('', 'Nájdite a rezervujte overených majstrov na Slovensku. Inštalatér, elektrikár, maliar, rekonštrukcia a ďalšie.');
+    this.seo.setPage('', 'Nájdite a rezervujte overených majstrov na Slovensku. Inštalatér, elektrikár, maliar, rekonštrukcia a ďalšie.', '/');
+    this.seo.setJsonLd({
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: 'Majstr',
+      url: 'https://majstr.app',
+      description: 'Nájdite a rezervujte overených remeselníkov na Slovensku',
+      inLanguage: 'sk',
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: {
+          '@type': 'EntryPoint',
+          urlTemplate: 'https://majstr.app/masters?search={search_term_string}',
+        },
+        'query-input': 'required name=search_term_string',
+      },
+    });
     this.api.getCategories().subscribe({
       next: (cats) => {
         this.hasMore.set(cats.length > HOME_CATEGORIES_LIMIT);
