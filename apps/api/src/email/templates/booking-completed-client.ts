@@ -37,9 +37,17 @@ export function renderBookingCompletedClient(data: BookingCompletedClientData): 
     ${infoTable(rows)}
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin:16px 0;background-color:#FFFBEB;border-radius:8px;border:1px solid #FDE68A;">
       <tr>
-        <td style="padding:16px 20px;font-family:Arial,Helvetica,sans-serif;">
-          <p style="margin:0 0 8px 0;font-size:22px;text-align:center;white-space:nowrap;letter-spacing:2px;">&#11088;&#11088;&#11088;&#11088;&#11088;</p>
-          <p style="margin:0;font-size:14px;color:#92400E;text-align:center;">Vaše hodnotenie nám veľmi pomáha. Stačí kliknúť nižšie!</p>
+        <td style="padding:16px 20px;font-family:Arial,Helvetica,sans-serif;text-align:center;">
+          <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin:0 auto 8px auto;">
+            <tr>
+              <td style="font-size:26px;padding:0 3px;line-height:1;">&#11088;</td>
+              <td style="font-size:26px;padding:0 3px;line-height:1;">&#11088;</td>
+              <td style="font-size:26px;padding:0 3px;line-height:1;">&#11088;</td>
+              <td style="font-size:26px;padding:0 3px;line-height:1;">&#11088;</td>
+              <td style="font-size:26px;padding:0 3px;line-height:1;">&#11088;</td>
+            </tr>
+          </table>
+          <p style="margin:0;font-size:14px;color:#92400E;">Vaše hodnotenie nám veľmi pomáha. Stačí kliknúť nižšie!</p>
         </td>
       </tr>
     </table>
