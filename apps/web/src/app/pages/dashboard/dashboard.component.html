@@ -137,154 +137,165 @@
         </div>
       }
 
-      @if (otherBookings().length > 0) {
+      @if (confirmedBookings().length > 0) {
+        <h2 class="section-label mt-3">Nadchádzajúce</h2>
+        <div class="booking-list">
+          @for (b of confirmedBookings(); track b.id) {
+            <ng-container *ngTemplateOutlet="bookingCard; context: { $implicit: b }"/>
+          }
+        </div>
+      }
+
+      @if (historyBookings().length > 0) {
         <h2 class="section-label mt-3">História</h2>
         <div class="booking-list">
-          @for (b of otherBookings(); track b.id) {
-            <div class="booking-card card">
-              <div class="card__body">
-
-                <!-- Row 1: service + status -->
-                <div class="booking-card__top">
-                  <h3 class="booking-card__title">{{ b.service?.name ?? 'Zmazaná služba' }}</h3>
-                  <span [class]="statusClass(b.status)">{{ statusLabel(b.status) }}</span>
-                </div>
-
-                <!-- Row 2: date -->
-                <p class="booking-card__meta">
-                  <span class="material-icons-outlined">calendar_today</span>
-                  {{ b.startTime | date:'dd.MM.yyyy, HH:mm' }}
-                </p>
-
-                <!-- Row 3: person + phone + address + note -->
-                <div class="booking-card__details">
-                  @if (auth.isMaster() && b.client) {
-                    <span class="booking-card__chip">
-                      <span class="material-icons-outlined">person</span>
-                      {{ b.client.firstName }} {{ b.client.lastName }}
-                    </span>
-                    @if (b.status === 'CONFIRMED' && b.client.phone) {
-                      <a class="booking-card__chip booking-card__chip--contact" href="tel:{{ b.client.phone }}">
-                        <span class="material-icons-outlined">phone</span>
-                        {{ b.client.phone }}
-                      </a>
-                    }
-                  } @else if (b.master) {
-                    <span class="booking-card__chip">
-                      <span class="material-icons-outlined">engineering</span>
-                      {{ b.master.firstName }} {{ b.master.lastName }}
-                    </span>
-                    @if (b.status === 'CONFIRMED' && b.master.phone) {
-                      <a class="booking-card__chip booking-card__chip--contact" href="tel:{{ b.master.phone }}">
-                        <span class="material-icons-outlined">phone</span>
-                        {{ b.master.phone }}
-                      </a>
-                    }
-                  }
-                  @if (b.address) {
-                    <span class="booking-card__chip">
-                      <span class="material-icons-outlined">location_on</span>
-                      {{ b.address }}
-                    </span>
-                  }
-                  @if (b.note) {
-                    <span class="booking-card__chip booking-card__chip--note">
-                      <span class="material-icons-outlined">chat_bubble_outline</span>
-                      {{ b.note }}
-                    </span>
-                  }
-                </div>
-
-                <!-- Price display -->
-                @if (b.status === 'COMPLETED' && (b.actualPrice !== null || b.estimatedPrice !== null)) {
-                  <p class="booking-card__price">
-                    <span class="material-icons-outlined">payments</span>
-                    @if (b.actualPrice !== null) {
-                      Konečná cena: <strong>{{ b.actualPrice | number:'1.2-2' }} €</strong>
-                    } @else if (b.estimatedPrice !== null) {
-                      Orientačná cena: <strong>{{ b.estimatedPrice | number:'1.2-2' }} €</strong>
-                      <span class="booking-card__price-note">(konečná cena nebola uvedená)</span>
-                    }
-                  </p>
-                } @else if (b.estimatedPrice !== null) {
-                  <p class="booking-card__price">
-                    <span class="material-icons-outlined">payments</span>
-                    Orientačná cena: <strong>{{ b.estimatedPrice | number:'1.2-2' }} €</strong>
-                  </p>
-                }
-
-                <!-- Row 4: actions -->
-                @if (b.status === 'CONFIRMED') {
-                  <div class="booking-card__footer">
-                    <div class="booking-card__cal">
-                      <button class="btn btn--ghost btn--xs" (click)="addToGoogleCalendar(b)">
-                        <span class="material-icons-outlined">event</span> Google
-                      </button>
-                      <button class="btn btn--ghost btn--xs" (click)="downloadIcs(b)">
-                        <span class="material-icons-outlined">download</span> .ics
-                      </button>
-                    </div>
-                    <div class="booking-card__action-btns">
-                      @if (auth.isMaster() && isPast(b.startTime)) {
-                        <button class="btn btn--primary btn--sm" (click)="openCompleteModal(b.id)">Označiť ako dokončené</button>
-                      }
-                      @if (!isPast(b.startTime)) {
-                        <button class="btn btn--ghost btn--sm" (click)="updateStatus(b.id, 'CANCELLED')">Zrušiť</button>
-                      }
-                    </div>
-                  </div>
-                }
-
-                <!-- Review section — client only, COMPLETED bookings -->
-                @if (!auth.isMaster() && b.status === 'COMPLETED') {
-                  @if (b.review) {
-                    <!-- Already reviewed -->
-                    <div class="review-submitted">
-                      <app-star-rating [value]="b.review.rating" />
-                      @if (b.review.comment) {
-                        <p class="review-submitted__comment">{{ b.review.comment }}</p>
-                      }
-                    </div>
-                  } @else if (reviewingBookingId() === b.id) {
-                    <!-- Inline review form -->
-                    <div class="review-form">
-                      <p class="review-form__label">Ohodnoťte majstra:</p>
-                      <app-star-rating
-                        [value]="reviewRating()"
-                        [interactive]="true"
-                        (valueChange)="reviewRating.set($event)"
-                      />
-                      <textarea
-                        class="form-field__input review-form__textarea"
-                        rows="2"
-                        placeholder="Voliteľný komentár..."
-                        [value]="reviewComment()"
-                        (input)="reviewComment.set($any($event.target).value)"
-                        maxlength="1000"
-                      ></textarea>
-                      <div class="review-form__actions">
-                        <button class="btn btn--primary btn--sm" (click)="submitReview(b.id)" [disabled]="submittingReview() || reviewRating() < 1">
-                          {{ submittingReview() ? 'Odosielam...' : 'Odoslať' }}
-                        </button>
-                        <button class="btn btn--ghost btn--sm" (click)="cancelReview()" [disabled]="submittingReview()">Zrušiť</button>
-                      </div>
-                    </div>
-                  } @else {
-                    <!-- Button to open review form -->
-                    <button class="btn btn--ghost btn--sm review-cta" (click)="openReviewForm(b.id)">
-                      <span class="material-icons-outlined">star_outline</span>
-                      Ohodnotiť
-                    </button>
-                  }
-                }
-
-              </div>
-            </div>
+          @for (b of historyBookings(); track b.id) {
+            <ng-container *ngTemplateOutlet="bookingCard; context: { $implicit: b }"/>
           }
         </div>
       }
     }
   }
+
+  <!-- ── Shared booking card template ──────────────────────────────────────── -->
+  <ng-template #bookingCard let-b>
+    <div class="booking-card card">
+      <div class="card__body">
+
+        <!-- Row 1: service + status -->
+        <div class="booking-card__top">
+          <h3 class="booking-card__title">{{ b.service?.name ?? 'Zmazaná služba' }}</h3>
+          <span [class]="statusClass(b.status)">{{ statusLabel(b.status) }}</span>
+        </div>
+
+        <!-- Row 2: date -->
+        <p class="booking-card__meta">
+          <span class="material-icons-outlined">calendar_today</span>
+          {{ b.startTime | date:'dd.MM.yyyy, HH:mm' }}
+        </p>
+
+        <!-- Row 3: person + phone + address + note -->
+        <div class="booking-card__details">
+          @if (auth.isMaster() && b.client) {
+            <span class="booking-card__chip">
+              <span class="material-icons-outlined">person</span>
+              {{ b.client.firstName }} {{ b.client.lastName }}
+            </span>
+            @if (b.status === 'CONFIRMED' && b.client.phone) {
+              <a class="booking-card__chip booking-card__chip--contact" href="tel:{{ b.client.phone }}">
+                <span class="material-icons-outlined">phone</span>
+                {{ b.client.phone }}
+              </a>
+            }
+          } @else if (b.master) {
+            <span class="booking-card__chip">
+              <span class="material-icons-outlined">engineering</span>
+              {{ b.master.firstName }} {{ b.master.lastName }}
+            </span>
+            @if (b.status === 'CONFIRMED' && b.master.phone) {
+              <a class="booking-card__chip booking-card__chip--contact" href="tel:{{ b.master.phone }}">
+                <span class="material-icons-outlined">phone</span>
+                {{ b.master.phone }}
+              </a>
+            }
+          }
+          @if (b.address) {
+            <span class="booking-card__chip">
+              <span class="material-icons-outlined">location_on</span>
+              {{ b.address }}
+            </span>
+          }
+          @if (b.note) {
+            <span class="booking-card__chip booking-card__chip--note">
+              <span class="material-icons-outlined">chat_bubble_outline</span>
+              {{ b.note }}
+            </span>
+          }
+        </div>
+
+        <!-- Price display -->
+        @if (b.status === 'COMPLETED' && (b.actualPrice !== null || b.estimatedPrice !== null)) {
+          <p class="booking-card__price">
+            <span class="material-icons-outlined">payments</span>
+            @if (b.actualPrice !== null) {
+              Konečná cena: <strong>{{ b.actualPrice | number:'1.2-2' }} €</strong>
+            } @else if (b.estimatedPrice !== null) {
+              Orientačná cena: <strong>{{ b.estimatedPrice | number:'1.2-2' }} €</strong>
+              <span class="booking-card__price-note">(konečná cena nebola uvedená)</span>
+            }
+          </p>
+        } @else if (b.estimatedPrice !== null) {
+          <p class="booking-card__price">
+            <span class="material-icons-outlined">payments</span>
+            Orientačná cena: <strong>{{ b.estimatedPrice | number:'1.2-2' }} €</strong>
+          </p>
+        }
+
+        <!-- Calendar links + cancel (CONFIRMED only) -->
+        @if (b.status === 'CONFIRMED') {
+          <div class="booking-card__footer">
+            <div class="booking-card__cal">
+              <button class="btn btn--ghost btn--xs" (click)="addToGoogleCalendar(b)">
+                <span class="material-icons-outlined">event</span> Google
+              </button>
+              <button class="btn btn--ghost btn--xs" (click)="downloadIcs(b)">
+                <span class="material-icons-outlined">download</span> .ics
+              </button>
+            </div>
+            <div class="booking-card__action-btns">
+              @if (auth.isMaster() && isPast(b.startTime)) {
+                <button class="btn btn--primary btn--sm" (click)="openCompleteModal(b.id)">Označiť ako dokončené</button>
+              }
+              @if (!isPast(b.startTime)) {
+                <button class="btn btn--ghost btn--sm" (click)="updateStatus(b.id, 'CANCELLED')">Zrušiť</button>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Review section — client only, COMPLETED bookings -->
+        @if (!auth.isMaster() && b.status === 'COMPLETED') {
+          @if (b.review) {
+            <div class="review-submitted">
+              <app-star-rating [value]="b.review.rating" />
+              @if (b.review.comment) {
+                <p class="review-submitted__comment">{{ b.review.comment }}</p>
+              }
+            </div>
+          } @else if (reviewingBookingId() === b.id) {
+            <div class="review-form">
+              <p class="review-form__label">Ohodnoťte majstra:</p>
+              <app-star-rating
+                [value]="reviewRating()"
+                [interactive]="true"
+                (valueChange)="reviewRating.set($event)"
+              />
+              <textarea
+                class="form-field__input review-form__textarea"
+                rows="2"
+                placeholder="Voliteľný komentár..."
+                [value]="reviewComment()"
+                (input)="reviewComment.set($any($event.target).value)"
+                maxlength="1000"
+              ></textarea>
+              <div class="review-form__actions">
+                <button class="btn btn--primary btn--sm" (click)="submitReview(b.id)" [disabled]="submittingReview() || reviewRating() < 1">
+                  {{ submittingReview() ? 'Odosielam...' : 'Odoslať' }}
+                </button>
+                <button class="btn btn--ghost btn--sm" (click)="cancelReview()" [disabled]="submittingReview()">Zrušiť</button>
+              </div>
+            </div>
+          } @else {
+            <button class="btn btn--ghost btn--sm review-cta" (click)="openReviewForm(b.id)">
+              <span class="material-icons-outlined">star_outline</span>
+              Ohodnotiť
+            </button>
+          }
+        }
+
+      </div>
+    </div>
+  </ng-template>
 
   @if (activeTab() === 'services' && auth.isMaster()) {
     <div class="services-header mt-2">
