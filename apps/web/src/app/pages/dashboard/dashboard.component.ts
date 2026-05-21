@@ -1,6 +1,6 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { DatePipe, DecimalPipe } from '@angular/common';
+import { DatePipe, DecimalPipe, NgTemplateOutlet } from '@angular/common';
 import {
   ApiService,
   Booking,
@@ -26,7 +26,7 @@ const STATUS_SK: Record<string, string> = {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [RouterLink, DatePipe, DecimalPipe, FormsModule, StarRatingComponent],
+  imports: [RouterLink, DatePipe, DecimalPipe, FormsModule, StarRatingComponent, NgTemplateOutlet],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
 })
@@ -50,8 +50,11 @@ export class DashboardComponent implements OnInit {
   pendingBookings = computed(() =>
     this.bookings().filter((b) => b.status === 'PENDING')
   );
-  otherBookings = computed(() =>
-    this.bookings().filter((b) => b.status !== 'PENDING')
+  confirmedBookings = computed(() =>
+    this.bookings().filter((b) => b.status === 'CONFIRMED')
+  );
+  historyBookings = computed(() =>
+    this.bookings().filter((b) => b.status === 'COMPLETED' || b.status === 'CANCELLED')
   );
 
   // Master profile
