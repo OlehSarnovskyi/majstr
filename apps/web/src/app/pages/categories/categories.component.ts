@@ -18,7 +18,7 @@ export class CategoriesComponent implements OnInit {
   private seo = inject(SeoService);
 
   ngOnInit() {
-    this.seo.setPage('Služby', 'Prehliadajte všetky kategórie služieb — inštalatér, elektrikár, maliar, rekonštrukcia a ďalšie.');
+    this.seo.setPage('Služby', 'Prehliadajte všetky kategórie služieb — inštalatér, elektrikár, maliar, rekonštrukcia a ďalšie.', '/categories');
     this.api.getCategories().subscribe({
       next: (cats) => {
         this.categories.set(cats);

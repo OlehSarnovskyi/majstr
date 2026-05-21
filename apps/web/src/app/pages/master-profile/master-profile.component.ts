@@ -35,10 +35,39 @@ export class MasterProfileComponent implements OnInit {
       next: (p) => {
         this.profile.set(p);
         this.loading.set(false);
+        const fullName = `${p.user.firstName} ${p.user.lastName}`;
         this.seo.setPage(
-          `${p.user.firstName} ${p.user.lastName}`,
-          `${p.user.firstName} ${p.user.lastName} — profesionálny majster na Majstr. ${p.user.services?.length || 0} dostupných služieb.`
+          fullName,
+          `${fullName} — profesionálny majster na Majstr. ${p.user.services?.length || 0} dostupných služieb.`,
+          `/masters/${p.slug}`
         );
+        this.seo.setJsonLd({
+          '@context': 'https://schema.org',
+          '@type': 'Person',
+          name: fullName,
+          url: `https://majstr.app/masters/${p.slug}`,
+          ...(p.user.bio ? { description: p.user.bio } : {}),
+          ...(p.user.city ? {
+            address: {
+              '@type': 'PostalAddress',
+              addressLocality: p.user.city.name,
+              addressCountry: 'SK',
+            },
+          } : {}),
+          ...(p.user.services?.length ? {
+            hasOfferCatalog: {
+              '@type': 'OfferCatalog',
+              name: 'Služby',
+              itemListElement: p.user.services.map(s => ({
+                '@type': 'Offer',
+                name: s.name,
+                description: s.description,
+                price: s.price,
+                priceCurrency: 'EUR',
+              })),
+            },
+          } : {}),
+        });
         // Load reviews separately after profile resolves (slug is confirmed)
         this.loadReviews(p.slug);
       },
