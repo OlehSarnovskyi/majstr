@@ -1,5 +1,6 @@
 import { IsOptional, IsString, MinLength, MaxLength, Matches, IsObject, IsUUID } from 'class-validator';
 import { Transform } from 'class-transformer';
+import { NoProfanity } from '../../common/validators/no-profanity.validator';
 
 export class UpdateProfileDto {
   @IsOptional()
@@ -7,6 +8,7 @@ export class UpdateProfileDto {
   @Transform(({ value }) => value?.trim())
   @MinLength(2)
   @MaxLength(50)
+  @NoProfanity()
   firstName?: string;
 
   @IsOptional()
@@ -14,6 +16,7 @@ export class UpdateProfileDto {
   @Transform(({ value }) => value?.trim())
   @MinLength(2)
   @MaxLength(50)
+  @NoProfanity()
   lastName?: string;
 
   @IsOptional()
@@ -28,6 +31,7 @@ export class UpdateProfileDto {
   @IsString()
   @Transform(({ value }) => value?.trim())
   @MaxLength(1000)
+  @NoProfanity()
   bio?: string;
 
   /** UUID of a City row — optional for all users */
