@@ -6,7 +6,7 @@
 
   &__grid {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
     gap: 40px;
     padding-bottom: 40px;
   }
@@ -61,6 +61,12 @@
 
       &:hover { color: white; }
     }
+  }
+
+  &__support-email {
+    font-size: 0.813rem;
+    color: #64748B;
+    word-break: break-all;
   }
 
   &__bottom {
