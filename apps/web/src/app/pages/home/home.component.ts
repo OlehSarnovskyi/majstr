@@ -2,6 +2,7 @@ import { Component, OnInit, signal, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ApiService, Category } from '../../core/services/api.service';
 import { SeoService } from '../../core/services/seo.service';
+import { AuthService } from '../../core/services/auth.service';
 
 const HOME_CATEGORIES_LIMIT = 12;
 
@@ -17,6 +18,7 @@ export class HomeComponent implements OnInit {
   loading = signal(true);
   hasMore = signal(false);
 
+  auth = inject(AuthService);
   private api = inject(ApiService);
   private seo = inject(SeoService);
 
