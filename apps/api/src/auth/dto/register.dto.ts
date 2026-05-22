@@ -1,5 +1,6 @@
 import { IsEmail, IsString, MinLength, MaxLength, IsOptional } from 'class-validator';
 import { Transform } from 'class-transformer';
+import { NoProfanity } from '../../common/validators/no-profanity.validator';
 
 export class RegisterDto {
   @IsEmail()
@@ -14,11 +15,13 @@ export class RegisterDto {
   @IsString()
   @Transform(({ value }) => value?.trim())
   @MinLength(2)
+  @NoProfanity()
   firstName: string;
 
   @IsString()
   @Transform(({ value }) => value?.trim())
   @MinLength(2)
+  @NoProfanity()
   lastName: string;
 
   @IsString()

@@ -1,4 +1,5 @@
-import { IsInt, IsOptional, IsString, IsUUID, Max, MaxLength, Min } from 'class-validator';
+import { IsInt, IsOptional, IsString, IsUUID, Max, MaxLength, Min, MinLength } from 'class-validator';
+import { NoProfanity } from '../../common/validators/no-profanity.validator';
 
 export class CreateReviewDto {
   @IsUUID()
@@ -11,6 +12,8 @@ export class CreateReviewDto {
 
   @IsOptional()
   @IsString()
+  @MinLength(5)
   @MaxLength(1000)
+  @NoProfanity()
   comment?: string;
 }
