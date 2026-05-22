@@ -13,9 +13,11 @@
         <span class="material-icons-outlined">search</span>
         Hľadať služby
       </a>
-      <a routerLink="/auth/register" class="btn btn--secondary btn--lg">
-        Pridať sa ako majster
-      </a>
+      @if (!auth.isLoggedIn()) {
+        <a routerLink="/auth/register" class="btn btn--secondary btn--lg">
+          Pridať sa ako majster
+        </a>
+      }
     </div>
     <div class="hero__stats">
       <div class="hero__stat">
