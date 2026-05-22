@@ -3,17 +3,21 @@ import { PrismaService } from '../prisma/prisma.service';
 import { generateSlug } from '../masters/utils/slug.util';
 
 const CATEGORIES = [
-  { name: 'Inštalatérstvo',          slug: 'instalaterstvo',          icon: 'plumbing' },
-  { name: 'Elektrikár',              slug: 'elektrikar',              icon: 'electrical_services' },
-  { name: 'Maľovanie',               slug: 'malovanie',               icon: 'format_paint' },
-  { name: 'Tesárstvo',               slug: 'tesarstvo',               icon: 'carpenter' },
-  { name: 'Upratovanie',             slug: 'upratovanie',             icon: 'cleaning_services' },
-  { name: 'Sťahovanie',              slug: 'stahovanie',              icon: 'local_shipping' },
-  { name: 'Rekonštrukcia',           slug: 'rekonstrukcia',           icon: 'construction' },
-  { name: 'Záhradníctvo',            slug: 'zahradnictvo',            icon: 'yard' },
-  { name: 'Zámočníctvo',             slug: 'zamocnictvo',             icon: 'lock' },
-  { name: 'Oprava spotrebičov',      slug: 'oprava-spotrebicov',      icon: 'home_repair_service' },
-  { name: 'IT a počítače',           slug: 'it-a-pocitace',           icon: 'computer' },
+  { name: 'Inštalatérstvo',              slug: 'instalaterstvo',    icon: 'plumbing' },
+  { name: 'Elektrikár',                  slug: 'elektrikar',        icon: 'electrical_services' },
+  { name: 'Maľovanie',                   slug: 'malovanie',         icon: 'format_paint' },
+  { name: 'Tesárstvo',                   slug: 'tesarstvo',         icon: 'carpenter' },
+  { name: 'Upratovanie',                 slug: 'upratovanie',       icon: 'cleaning_services' },
+  { name: 'Sťahovanie',                  slug: 'stahovanie',        icon: 'local_shipping' },
+  { name: 'Rekonštrukcia',               slug: 'rekonstrukcia',     icon: 'construction' },
+  { name: 'Záhradníctvo',                slug: 'zahradnictvo',      icon: 'yard' },
+  { name: 'Zámočníctvo',                 slug: 'zamocnictvo',       icon: 'lock' },
+  { name: 'Oprava spotrebičov',          slug: 'oprava-spotrebicov', icon: 'home_repair_service' },
+  { name: 'Murárstvo',                   slug: 'murarstvo',         icon: 'foundation' },
+  { name: 'Kúrenár / Plynár',            slug: 'kurenar',           icon: 'local_fire_department' },
+  { name: 'Klampiarstvo / Pokrývačstvo', slug: 'klampiarstvo',      icon: 'roofing' },
+  { name: 'Montáž nábytku',             slug: 'montaz-nabytku',    icon: 'chair_alt' },
+  // Removed: IT a počítače — not relevant for craftsmen platform
   // Removed: Starostlivosť o zvieratá, Opatrovateľstvo, Doučovanie — not relevant for craftsmen platform
 ];
 
