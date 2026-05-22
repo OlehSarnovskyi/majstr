@@ -290,8 +290,13 @@ export class DashboardComponent implements OnInit {
     const durationMs = (b.service?.durationMinutes ?? 60) * 60000;
     const start = new Date(b.startTime);
     const end = new Date(start.getTime() + durationMs);
-    const fmt = (d: Date) => d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
-    const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(serviceName)}&dates=${fmt(start)}/${fmt(end)}${b.note ? '&details=' + encodeURIComponent(b.note) : ''}`;
+    // Use local (floating) time — no Z suffix — so Google Calendar shows the
+    // exact same clock time the user sees in the dashboard (browser local timezone).
+    const fmtLocal = (d: Date) => {
+      const pad = (n: number) => String(n).padStart(2, '0');
+      return `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}T${pad(d.getHours())}${pad(d.getMinutes())}00`;
+    };
+    const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(serviceName)}&dates=${fmtLocal(start)}/${fmtLocal(end)}${b.note ? '&details=' + encodeURIComponent(b.note) : ''}`;
     window.open(url, '_blank');
   }
 
