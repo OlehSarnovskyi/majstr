@@ -72,14 +72,22 @@ const PAGE_SIZE = 20;
             @for (booking of bookings(); track booking.id) {
               <tr>
                 <td>
-                  <div style="font-weight: 500;">{{ booking.client.firstName }} {{ booking.client.lastName }}</div>
-                  <div class="text-muted text-sm">{{ booking.client.email }}</div>
+                  @if (booking.client) {
+                    <div style="font-weight: 500;">{{ booking.client.firstName }} {{ booking.client.lastName }}</div>
+                    <div class="text-muted text-sm">{{ booking.client.email }}</div>
+                  } @else {
+                    <span class="text-muted">—</span>
+                  }
                 </td>
                 <td>
-                  <div style="font-weight: 500;">{{ booking.master.firstName }} {{ booking.master.lastName }}</div>
-                  <div class="text-muted text-sm">{{ booking.master.email }}</div>
+                  @if (booking.master) {
+                    <div style="font-weight: 500;">{{ booking.master.firstName }} {{ booking.master.lastName }}</div>
+                    <div class="text-muted text-sm">{{ booking.master.email }}</div>
+                  } @else {
+                    <span class="text-muted">—</span>
+                  }
                 </td>
-                <td>{{ booking.service.name }}</td>
+                <td>{{ booking.service?.name ?? '—' }}</td>
                 <td>
                   <span class="badge" [class]="statusBadge(booking.status)">
                     {{ booking.status | lowercase }}
