@@ -7,6 +7,7 @@ import { renderBookingCompletedClient } from './templates/booking-completed-clie
 import { renderWelcomeMaster } from './templates/welcome-master';
 import { renderWelcomeClient } from './templates/welcome-client';
 import { renderEmailVerification } from './templates/email-verification';
+import { renderPasswordReset } from './templates/password-reset';
 
 const FRONTEND_URL = process.env['FRONTEND_URL'] || 'https://majstr.app';
 
@@ -138,13 +139,9 @@ export class EmailService {
   // ─── Legacy / existing methods ─────────────────────────────────────────────
 
   async sendPasswordResetEmail(to: string, firstName: string, token: string) {
-    const frontendUrl = process.env['FRONTEND_URL'] || 'http://localhost:4200';
-    const resetUrl = `${frontendUrl}/auth/reset-password?token=${token}`;
-    await this.sendMail(
-      to,
-      'Obnovenie hesla — Majstr',
-      `Dobrý deň ${firstName},\n\nPožiadali ste o obnovenie hesla. Kliknite na odkaz nižšie pre nastavenie nového hesla:\n\n${resetUrl}\n\nOdkaz je platný 1 hodinu. Ak ste o obnovenie nepožiadali, ignorujte tento email.\n\nMajstr`
-    );
+    const resetUrl = `${FRONTEND_URL}/auth/reset-password?token=${token}`;
+    const html = renderPasswordReset({ firstName, resetUrl });
+    await this.sendMail(to, 'Obnovenie hesla — Majstr', '', html);
   }
 
   async sendWelcomeEmail(to: string, firstName: string) {
