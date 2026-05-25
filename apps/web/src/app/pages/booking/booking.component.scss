@@ -74,6 +74,16 @@
 
 textarea.form-field__input { resize: vertical; }
 
+input[type="date"].form-field__input {
+  width: auto;
+  min-width: 180px;
+  max-width: 220px;
+  text-align: left;
+  // iOS fix: prevent the default centered appearance
+  -webkit-appearance: none;
+  appearance: none;
+}
+
 // ── Slot picker ──────────────────────────────────────────────────────────────
 .slot-grid {
   display: flex;
