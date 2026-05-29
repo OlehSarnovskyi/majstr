@@ -49,6 +49,17 @@ const PROFILE_SELECT = {
   },
 } satisfies Prisma.MasterProfileSelect;
 
+/** Same as PROFILE_SELECT but includes phone — only for the owner's own profile */
+const MY_PROFILE_SELECT = {
+  ...PROFILE_SELECT,
+  user: {
+    select: {
+      ...PROFILE_SELECT.user.select,
+      phone: true,
+    },
+  },
+} satisfies Prisma.MasterProfileSelect;
+
 @Injectable()
 export class MastersService {
   private readonly logger = new Logger(MastersService.name);
@@ -167,7 +178,7 @@ export class MastersService {
   async getMyProfile(userId: string) {
     return this.prisma.masterProfile.findUnique({
       where: { userId },
-      select: PROFILE_SELECT,
+      select: MY_PROFILE_SELECT,
     });
   }
 
