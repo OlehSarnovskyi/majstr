@@ -382,6 +382,9 @@ export class AuthService {
     lastName: string;
     role: string;
     roleChosen: boolean;
+    phone?: string | null;
+    avatar?: string | null;
+    bio?: string | null;
     city?: { id: string; name: string; slug: string } | null;
     workingHours?: unknown;
   }) {
@@ -395,6 +398,9 @@ export class AuthService {
         lastName: user.lastName,
         role: user.role,
         roleChosen: user.roleChosen,
+        phone: user.phone ?? null,
+        avatar: user.avatar ?? null,
+        bio: user.bio ?? null,
         city: user.city ?? null,
         workingHours: user.workingHours ?? null,
       },
