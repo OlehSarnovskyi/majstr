@@ -20,7 +20,7 @@ export class SitemapController {
         orderBy: { updatedAt: 'desc' },
       }),
       this.prisma.serviceCategory.findMany({
-        select: { slug: true, updatedAt: true },
+        select: { slug: true },
         orderBy: { name: 'asc' },
       }),
     ]);
@@ -46,7 +46,7 @@ export class SitemapController {
 
     const categoryUrls: UrlEntry[] = categories.map(c => ({
       loc: `/categories/${c.slug}`,
-      lastmod: c.updatedAt.toISOString().split('T')[0],
+      lastmod: today,
       changefreq: 'weekly',
       priority: '0.7',
     }));
