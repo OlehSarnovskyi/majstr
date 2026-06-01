@@ -8,6 +8,9 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard, ROLES_KEY } from '../auth/roles.guard';
 import { PrismaService } from '../prisma/prisma.service';
 import { ReviewsService } from '../reviews/reviews.service';
+import { EmailService } from '../email/email.service';
+
+const mockEmailService = { sendWelcomeMaster: jest.fn().mockResolvedValue(undefined) };
 
 // ─── Mock factories ──────────────────────────────────────────────────────────
 
@@ -109,6 +112,7 @@ async function buildApp(
         provide: ReviewsService,
         useValue: { findByMaster: jest.fn().mockResolvedValue([]) },
       },
+      { provide: EmailService, useValue: mockEmailService },
     ],
   })
     .overrideGuard(JwtAuthGuard)

@@ -19,7 +19,7 @@ import { AdminAuthService } from '../core/services/admin-auth.service';
 
     <!-- Backdrop -->
     @if (sidebarOpen()) {
-      <div class="sidebar-backdrop" (click)="closeSidebar()"></div>
+      <div class="sidebar-backdrop" role="button" tabindex="0" (click)="closeSidebar()" (keydown.enter)="closeSidebar()" (keydown.escape)="closeSidebar()"></div>
     }
 
     <div class="admin-layout">

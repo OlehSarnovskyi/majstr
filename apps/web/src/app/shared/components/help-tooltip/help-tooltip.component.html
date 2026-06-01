@@ -1,4 +1,4 @@
-<span class="help-tooltip" (click)="toggle(); $event.stopPropagation()">
+<span class="help-tooltip" role="button" tabindex="0" (click)="toggle(); $event.stopPropagation()" (keydown.enter)="toggle(); $event.stopPropagation()">
   <span class="help-tooltip__icon" [class.help-tooltip__icon--active]="visible()">?</span>
   @if (visible()) {
     <span class="help-tooltip__popup" role="tooltip">

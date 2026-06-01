@@ -10,9 +10,13 @@ import { JwtStrategy } from './jwt.strategy';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { PrismaService } from '../prisma/prisma.service';
 import { EmailService } from '../email/email.service';
+import { MastersService } from '../masters/masters.service';
+
+const mockMastersService = { createProfile: jest.fn(), getMyProfile: jest.fn() };
 
 // Must match the fallback in jwt.strategy.ts and auth.module.ts
-const TEST_JWT_SECRET = 'dev-only-secret-change-in-production';
+// Match whatever secret JwtStrategy will use at runtime (reads process.env.JWT_SECRET at module load)
+const TEST_JWT_SECRET = process.env['JWT_SECRET'] || 'dev-only-secret-change-in-production';
 
 // ─── Prisma mock factory ────────────────────────────────────────────────────
 
@@ -43,6 +47,8 @@ const mockEmailService = {
   sendEmailVerification: jest.fn().mockResolvedValue(undefined),
   sendPasswordResetEmail: jest.fn().mockResolvedValue(undefined),
   sendWelcomeEmail: jest.fn().mockResolvedValue(undefined),
+  sendWelcomeClient: jest.fn().mockResolvedValue(undefined),
+  sendWelcomeMaster: jest.fn().mockResolvedValue(undefined),
   sendNewBookingNotification: jest.fn().mockResolvedValue(undefined),
   sendBookingStatusUpdate: jest.fn().mockResolvedValue(undefined),
 };
@@ -68,6 +74,10 @@ const existingUser = {
   resetToken: null,
   resetTokenExpiry: null,
   password: '', // filled in beforeAll
+  isBanned: false,
+  city: null,
+  workingHours: null,
+  timezone: null,
 };
 
 // ─── Test suite ─────────────────────────────────────────────────────────────
@@ -100,6 +110,7 @@ describe('AuthController (e2e)', () => {
         JwtAuthGuard,
         { provide: PrismaService, useValue: prismaMock },
         { provide: EmailService, useValue: mockEmailService },
+        { provide: MastersService, useValue: mockMastersService },
       ],
     }).compile();
 

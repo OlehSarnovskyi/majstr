@@ -396,8 +396,8 @@
   }
 
   @if (showWelcomeModal()) {
-    <div class="modal-overlay" (click)="closeWelcomeModal()">
-      <div class="modal-box" (click)="$event.stopPropagation()">
+    <div class="modal-overlay" role="button" tabindex="0" (click)="closeWelcomeModal()" (keydown.enter)="closeWelcomeModal()" (keydown.escape)="closeWelcomeModal()">
+      <div class="modal-box" role="dialog" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()">
         <h2 class="modal-box__title">Vitajte v Majstr! 🎉</h2>
         <p class="modal-box__subtitle text-muted">Váš profil je aktívny. Tu sú 3 kroky, ako začať:</p>
         <ol class="modal-box__steps">

@@ -10,9 +10,13 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { AuthService } from '../auth/auth.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { EmailService } from '../email/email.service';
+import { MastersService } from '../masters/masters.service';
+
+const mockMastersService = { createProfile: jest.fn(), getMyProfile: jest.fn() };
 
 // Must match the fallback in jwt.strategy.ts and auth.module.ts
-const TEST_JWT_SECRET = 'dev-only-secret-change-in-production';
+// Match whatever secret JwtStrategy will use at runtime (reads process.env.JWT_SECRET at module load)
+const TEST_JWT_SECRET = process.env['JWT_SECRET'] || 'dev-only-secret-change-in-production';
 
 // ─── Mock factories ──────────────────────────────────────────────────────────
 
@@ -41,11 +45,15 @@ function createPrismaMock() {
 }
 
 const mockEmailService = {
-  sendNewBookingNotification: jest.fn().mockResolvedValue(undefined),
-  sendBookingStatusUpdate: jest.fn().mockResolvedValue(undefined),
   sendEmailVerification: jest.fn().mockResolvedValue(undefined),
   sendPasswordResetEmail: jest.fn().mockResolvedValue(undefined),
   sendWelcomeEmail: jest.fn().mockResolvedValue(undefined),
+  sendWelcomeClient: jest.fn().mockResolvedValue(undefined),
+  sendWelcomeMaster: jest.fn().mockResolvedValue(undefined),
+  sendNewBookingToMaster: jest.fn().mockResolvedValue(undefined),
+  sendBookingConfirmedToClient: jest.fn().mockResolvedValue(undefined),
+  sendBookingCancelled: jest.fn().mockResolvedValue(undefined),
+  sendBookingCompletedToClient: jest.fn().mockResolvedValue(undefined),
 };
 
 // ─── Test data ───────────────────────────────────────────────────────────────
@@ -59,6 +67,10 @@ const testClient = {
   phone: null,
   avatar: null,
   bio: null,
+  isBanned: false,
+  city: null,
+  workingHours: null,
+  timezone: null,
 };
 
 const testMaster = {
@@ -69,6 +81,10 @@ const testMaster = {
   role: 'MASTER',
   phone: null,
   avatar: null,
+  isBanned: false,
+  city: null,
+  workingHours: null,
+  timezone: null,
 };
 
 // price is a Decimal in Prisma — mock returns a plain object that serializes the same way
@@ -131,6 +147,7 @@ describe('BookingsController (e2e)', () => {
         JwtAuthGuard,
         { provide: PrismaService, useValue: prismaMock },
         { provide: EmailService, useValue: mockEmailService },
+        { provide: MastersService, useValue: mockMastersService },
       ],
     }).compile();
 
