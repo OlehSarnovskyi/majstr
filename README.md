@@ -1,8 +1,37 @@
 # Majstr
 
-A platform for finding and booking craftsman services in Slovakia.
+A platform for finding and booking craftsman services (plumbers, electricians, repairs) in Slovakia.
+
+**Status: frozen — August 2026.** The project reached production and is left running in
+maintenance mode. It is not actively developed and no new features are planned. No company
+was ever incorporated around it; there is no commercial operation to wind down. The code
+is kept public as a portfolio reference and the deployment is kept alive because it costs
+nothing to do so.
 
 **Tech stack:** Angular + NestJS + PostgreSQL + Prisma, Nx monorepo.
+Deployed on Vercel (web, admin) and Northflank (API), with Neon for Postgres and Brevo for
+transactional e-mail.
+
+## What was built
+
+Two-sided marketplace with a separate admin back-office:
+
+- **Clients** browse masters by city and service category, view profiles and reviews, and
+  book a time slot against the master's working hours.
+- **Masters** manage their public profile, service catalogue, working hours, and incoming
+  bookings (confirm / complete / cancel), with e-mail notification at each transition.
+- **Admin panel** (separate deployment) for moderating users, bookings, reviews, and the
+  service-category tree.
+
+Cross-cutting: e-mail/password and Google OAuth sign-in with e-mail verification and
+password reset, JWT auth, rate limiting, a Slovak-language profanity filter on all
+user-submitted text, GDPR account deletion, HTML transactional e-mail templates, and a
+dynamic `sitemap.xml` covering master profiles and categories for SEO.
+
+## Reviving it
+
+Everything below still works — the setup instructions are current. Clone, follow
+[Local development setup](#local-development-setup), and it runs.
 
 ## Project structure
 
@@ -10,6 +39,7 @@ A platform for finding and booking craftsman services in Slovakia.
 apps/
   web/          # Angular frontend (port 4200)
   api/          # NestJS backend  (port 3000)
+  admin/        # Angular admin panel (port 4201)
 libs/
   shared/       # Shared types, interfaces, DTOs
 prisma/
